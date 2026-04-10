@@ -10,7 +10,11 @@ export default defineConfig({
     plugins: [tailwindcss()]
   },
   adapter: cloudflare({
-    // IMPORTANTE: Desactivamos esto por ahora para evitar conflictos de nombres reservados
-    imageService: 'passthrough' 
+    // Desactivamos todo lo que genera conflictos de nombres
+    platformProxy: {
+      enabled: false
+    },
+    // Evita que intente usar Cloudflare Images
+    imageService: 'passthrough'
   })
 });
