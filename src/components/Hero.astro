@@ -1,0 +1,75 @@
+---
+import WaveDivider from "./WaveDivider.astro";
+---
+
+<section id="inicio" class="relative bg-verde-dark min-h-screen flex items-center overflow-hidden">
+  <!-- Decorative SVG elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <!-- Top-left circle -->
+    <svg class="absolute -top-20 -left-20 w-64 h-64 opacity-10" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="90" fill="#FCAE05" />
+    </svg>
+    <!-- Right blob -->
+    <svg class="absolute top-1/4 -right-16 w-80 h-80 opacity-[0.07]" viewBox="0 0 200 200">
+      <path
+        d="M47.5,-57.2C59.3,-46.8,65,-29.5,67.8,-11.6C70.6,6.4,70.5,25,62.3,39.1C54.1,53.2,37.8,62.8,20.1,67.4C2.4,72,-16.7,71.6,-32.4,64C-48.1,56.4,-60.4,41.6,-66.5,24.7C-72.6,7.8,-72.5,-11.2,-64.8,-25.8C-57.1,-40.4,-41.8,-50.6,-26.5,-59.7C-11.2,-68.8,4.1,-76.8,19.1,-74.8C34.1,-72.8,48.8,-60.8,47.5,-57.2Z"
+        transform="translate(100 100)"
+        fill="#FCAE05"
+      />
+    </svg>
+    <!-- Bottom-left dots pattern -->
+    <svg class="absolute bottom-32 left-8 w-40 h-40 opacity-10" viewBox="0 0 100 100">
+      {
+        Array.from({ length: 25 }).map((_, i) => (
+          <circle
+            cx={12 + (i % 5) * 20}
+            cy={12 + Math.floor(i / 5) * 20}
+            r="3"
+            fill="#FCAE05"
+          />
+        ))
+      }
+    </svg>
+    <!-- Small circle right -->
+    <svg class="absolute bottom-40 right-20 w-24 h-24 opacity-10" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="45" stroke="#FCAE05" stroke-width="3" fill="none" />
+    </svg>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 md:py-36">
+    <div class="flex flex-col md:flex-row items-center gap-8 md:gap-16">
+      <!-- Text -->
+      <div class="text-center md:text-left flex-1">
+        <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-4 tracking-tight">
+          Amerandú
+        </h1>
+        <p class="text-xl sm:text-2xl md:text-3xl text-amarillo font-semibold mb-6">
+          Club de lectura y pensamiento latinoamericano
+        </p>
+        <p class="text-base sm:text-lg md:text-xl text-white/90 max-w-xl mb-10 leading-relaxed font-light">
+          Un espacio para leer, dialogar y reflexionar sobre las ideas, la
+          literatura y las culturas de América Latina.
+        </p>
+        <a
+          href="#contacto"
+          class="inline-block bg-rojo text-white px-8 py-4 rounded-full text-lg font-semibold hover:scale-105 hover:shadow-2xl hover:shadow-rojo/30 transition-all duration-300"
+        >
+          Unirme al club
+        </a>
+      </div>
+      <!-- Logo -->
+      <div class="flex-shrink-0">
+        <img
+          src="/images/logo-blanco.png"
+          alt="Logo de Amerandú"
+          class="w-48 sm:w-56 md:w-72 lg:w-80 h-auto drop-shadow-2xl opacity-90"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom wave -->
+  <div class="absolute bottom-0 left-0 w-full">
+    <WaveDivider fillColor="#FFFDF7" variant="wave1" />
+  </div>
+</section>

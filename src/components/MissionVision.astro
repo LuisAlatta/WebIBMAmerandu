@@ -1,0 +1,75 @@
+---
+import WaveDivider from "./WaveDivider.astro";
+---
+
+<section class="relative bg-amarillo/15 pt-20 pb-48 md:pt-28 md:pb-60 overflow-hidden">
+  <!-- Decorative background -->
+  <div class="absolute inset-0 pointer-events-none">
+    <svg class="absolute -top-10 -right-10 w-64 h-64 opacity-[0.06]" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="90" fill="#FCAE05" />
+    </svg>
+    <svg class="absolute bottom-10 -left-10 w-48 h-48 opacity-[0.06]" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="90" fill="#055B3D" />
+    </svg>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid md:grid-cols-3 gap-8 lg:gap-10">
+      <!-- Propósito -->
+      <div class="animate-on-scroll bg-white rounded-3xl p-8 shadow-md shadow-amarillo/10 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center">
+        <div class="w-14 h-14 bg-amarillo/15 rounded-2xl flex items-center justify-center mb-5 mx-auto">
+          <!-- Person with sparkle icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FCAE05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7" aria-hidden="true">
+            <circle cx="12" cy="8" r="5" />
+            <path d="M20 21a8 8 0 0 0-16 0" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-verde-dark mb-3">Propósito</h3>
+        <p class="text-texto text-sm leading-relaxed">
+          Promover el encuentro y el diálogo en torno a la lectura y el
+          pensamiento latinoamericano, generando un espacio colectivo de reflexión
+          sobre la cultura, la literatura y las ideas de América Latina.
+        </p>
+      </div>
+
+      <!-- Misión -->
+      <div class="animate-on-scroll bg-white rounded-3xl p-8 shadow-md shadow-amarillo/10 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center">
+        <div class="w-14 h-14 bg-verde-dark/10 rounded-2xl flex items-center justify-center mb-5 mx-auto">
+          <!-- Book/compass icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#055B3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7" aria-hidden="true">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-verde-dark mb-3">Misión</h3>
+        <p class="text-texto text-sm leading-relaxed">
+          Crear un espacio de lectura y discusión que acerque a los participantes
+          a las diversas tradiciones literarias, culturales e intelectuales de
+          América Latina, fomentando el intercambio de ideas, la reflexión crítica
+          y la construcción colectiva de conocimiento.
+        </p>
+      </div>
+
+      <!-- Visión -->
+      <div class="animate-on-scroll bg-white rounded-3xl p-8 shadow-md shadow-amarillo/10 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 text-center">
+        <div class="w-14 h-14 bg-naranja/10 rounded-2xl flex items-center justify-center mb-5 mx-auto">
+          <!-- Eye/vision icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#EE6F01" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7" aria-hidden="true">
+            <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-verde-dark mb-3">Visión</h3>
+        <p class="text-texto text-sm leading-relaxed">
+          Consolidarse como un espacio de referencia para la lectura y el
+          pensamiento latinoamericano, capaz de reunir a una comunidad interesada
+          en reflexionar sobre la identidad, la cultura y las ideas de la región.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom wave -->
+  <div class="absolute bottom-0 left-0 w-full">
+    <WaveDivider fillColor="#FFFDF7" variant="wave1" />
+  </div>
+</section>

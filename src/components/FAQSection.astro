@@ -1,0 +1,31 @@
+---
+import FAQ from "./FAQ";
+import WaveDivider from "./WaveDivider.astro";
+---
+
+<section id="faq" class="relative bg-crema pt-20 pb-48 md:pt-28 md:pb-60 overflow-hidden">
+  <!-- Decorative cultural elements -->
+  <img
+    src="/images/elementos-decorativos.png"
+    alt=""
+    aria-hidden="true"
+    class="absolute -left-12 top-12 w-44 md:w-56 opacity-[0.05] pointer-events-none -scale-x-100"
+    loading="lazy"
+  />
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12 animate-on-scroll">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-verde-dark mb-4">
+        Preguntas frecuentes
+      </h2>
+    </div>
+
+    <div class="animate-on-scroll">
+      <FAQ client:visible />
+    </div>
+  </div>
+
+  <!-- Bottom wave -->
+  <div class="absolute bottom-0 left-0 w-full">
+    <WaveDivider fillColor="#055B3D" variant="wave2" />
+  </div>
+</section>

@@ -1,0 +1,81 @@
+---
+interface Props {
+  fillColor?: string;
+  bgColor?: string;
+  flip?: boolean;
+  variant?: "wave1" | "wave2" | "wave3" | "blob";
+}
+
+const {
+  fillColor = "#FFFDF7",
+  bgColor = "transparent",
+  flip = false,
+  variant = "wave1",
+} = Astro.props;
+---
+
+<div
+  class:list={["w-full overflow-hidden leading-[0]", { "rotate-180": flip }]}
+  style={`background-color: ${bgColor};`}
+>
+  {
+    variant === "wave1" && (
+      <svg
+        viewBox="0 0 1440 120"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+        class="w-full h-[60px] md:h-[80px] lg:h-[120px]"
+      >
+        <path
+          d="M0,60 C240,120 480,0 720,60 C960,120 1200,0 1440,60 L1440,120 L0,120 Z"
+          fill={fillColor}
+        />
+      </svg>
+    )
+  }
+  {
+    variant === "wave2" && (
+      <svg
+        viewBox="0 0 1440 120"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+        class="w-full h-[60px] md:h-[80px] lg:h-[120px]"
+      >
+        <path
+          d="M0,40 C180,100 360,0 540,50 C720,100 900,10 1080,50 C1260,90 1380,20 1440,40 L1440,120 L0,120 Z"
+          fill={fillColor}
+        />
+      </svg>
+    )
+  }
+  {
+    variant === "wave3" && (
+      <svg
+        viewBox="0 0 1440 120"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+        class="w-full h-[60px] md:h-[80px] lg:h-[120px]"
+      >
+        <path
+          d="M0,80 C160,30 320,100 480,60 C640,20 800,90 960,50 C1120,10 1280,80 1440,40 L1440,120 L0,120 Z"
+          fill={fillColor}
+        />
+      </svg>
+    )
+  }
+  {
+    variant === "blob" && (
+      <svg
+        viewBox="0 0 1440 120"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+        class="w-full h-[60px] md:h-[80px] lg:h-[120px]"
+      >
+        <path
+          d="M0,60 Q360,120 720,60 T1440,60 L1440,120 L0,120 Z"
+          fill={fillColor}
+        />
+      </svg>
+    )
+  }
+</div>

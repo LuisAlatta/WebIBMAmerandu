@@ -1,0 +1,39 @@
+---
+import ContactForm from "./ContactForm";
+---
+
+<section id="contacto" class="relative bg-verde-dark pt-20 pb-40 md:pt-28 md:pb-48">
+  <!-- Decorative dots -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <svg class="absolute top-10 right-10 w-32 h-32 opacity-10" viewBox="0 0 100 100">
+      {
+        Array.from({ length: 16 }).map((_, i) => (
+          <circle
+            cx={12 + (i % 4) * 25}
+            cy={12 + Math.floor(i / 4) * 25}
+            r="3"
+            fill="#FCAE05"
+          />
+        ))
+      }
+    </svg>
+    <svg class="absolute bottom-20 left-8 w-24 h-24 opacity-10" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="45" stroke="#FCAE05" stroke-width="3" fill="none" />
+    </svg>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12 animate-on-scroll">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+        ¡Formá parte de Amerandú!
+      </h2>
+      <p class="text-amarillo text-lg sm:text-xl">
+        Completá el formulario y nos pondremos en contacto contigo.
+      </p>
+    </div>
+
+    <div class="animate-on-scroll">
+      <ContactForm client:visible />
+    </div>
+  </div>
+</section>
