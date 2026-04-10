@@ -1,15 +1,7 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "amerandu-web",
   "compatibility_date": "2026-04-10",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
-  "main": "./dist/_worker.js",
-  "assets": {
-    "directory": "./dist",
-    "binding": "ASSETS"
-  },
-  "observability": {
-    "enabled": true
-  }
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": "./dist"
 }
