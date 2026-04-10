@@ -1,0 +1,63 @@
+---
+import MobileMenu from "./MobileMenu";
+---
+
+<header
+  id="navbar"
+  class="fixed top-0 left-0 w-full z-50 bg-transparent transition-all duration-300"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 md:h-20">
+      <!-- Logo -->
+      <a href="#inicio" class="flex items-center gap-2 group">
+        <img
+          src="/images/logo-blanco.png"
+          alt="Amerandú — Club de lectura y pensamiento latinoamericano"
+          class="h-10 md:h-14 w-auto"
+        />
+      </a>
+
+      <!-- Desktop nav -->
+      <nav class="hidden md:flex items-center gap-1 lg:gap-2">
+        <a
+          href="#inicio"
+          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
+          >Inicio</a
+        >
+        <a
+          href="#nosotros"
+          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
+          >Nosotros</a
+        >
+        <a
+          href="#club"
+          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
+          >Club de lectura</a
+        >
+        <a
+          href="#unete"
+          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
+          >Únete</a
+        >
+        <a
+          href="#faq"
+          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
+          >FAQ</a
+        >
+        <a
+          href="#contacto"
+          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
+          >Contacto</a
+        >
+        <a
+          href="#contacto"
+          class="ml-3 bg-rojo text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-rojo/90 hover:scale-105 hover:shadow-lg transition-all duration-300"
+          >Unirme al club</a
+        >
+      </nav>
+
+      <!-- Mobile menu -->
+      <MobileMenu client:load />
+    </div>
+  </div>
+</header>

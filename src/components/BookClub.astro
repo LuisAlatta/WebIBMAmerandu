@@ -1,0 +1,77 @@
+---
+import WaveDivider from "./WaveDivider.astro";
+---
+
+<section id="club" class="relative bg-verde-medio/12 pt-20 pb-48 md:pt-28 md:pb-60 overflow-hidden">
+  <!-- Decorative cultural elements -->
+  <img
+    src="/images/elementos-decorativos.png"
+    alt=""
+    aria-hidden="true"
+    class="absolute -right-16 top-8 w-48 md:w-64 opacity-[0.06] pointer-events-none"
+    loading="lazy"
+  />
+  <img
+    src="/images/elementos-decorativos.png"
+    alt=""
+    aria-hidden="true"
+    class="absolute -left-20 bottom-24 w-40 md:w-56 opacity-[0.05] pointer-events-none rotate-180"
+    loading="lazy"
+  />
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12 animate-on-scroll">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-verde-dark mb-6">
+        Club de lectura
+      </h2>
+      <p class="text-texto text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+        Espacios periódicos donde se leen y analizan textos de autores
+        latinoamericanos desde distintas perspectivas culturales, históricas y
+        sociales.
+      </p>
+    </div>
+
+    <div class="animate-on-scroll max-w-2xl mx-auto">
+      <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-lg shadow-verde-dark/5 hover:shadow-xl hover:shadow-verde-dark/10 transition-all duration-300">
+        <!-- Icon -->
+        <div class="w-16 h-16 bg-verde-dark/10 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#055B3D"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="w-8 h-8" aria-hidden="true"
+          >
+            <path d="M12 7v14" />
+            <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+          </svg>
+        </div>
+
+        <h3 class="text-xl sm:text-2xl font-bold text-verde-dark text-center mb-4">
+          Encuentros de lectura
+        </h3>
+        <p class="text-texto text-center leading-relaxed mb-8">
+          En cada encuentro exploramos un texto diferente, compartimos
+          interpretaciones y construimos juntos nuevas formas de comprender la
+          realidad latinoamericana. Un espacio abierto, respetuoso y enriquecedor
+          para todos los niveles de lectura.
+        </p>
+        <div class="text-center">
+          <a
+            href="#contacto"
+            class="inline-block bg-rojo text-white px-8 py-3.5 rounded-full font-semibold hover:scale-105 hover:shadow-lg hover:shadow-rojo/20 transition-all duration-300"
+          >
+            Quiero participar
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom wave -->
+  <div class="absolute bottom-0 left-0 w-full">
+    <WaveDivider fillColor="#FCAE05" variant="wave3" />
+  </div>
+</section>

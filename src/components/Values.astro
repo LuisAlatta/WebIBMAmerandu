@@ -1,0 +1,92 @@
+---
+import WaveDivider from "./WaveDivider.astro";
+---
+
+<section class="relative bg-crema pt-20 pb-48 md:pt-28 md:pb-60 overflow-hidden">
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14 animate-on-scroll">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-verde-dark mb-4">
+        Nuestros valores
+      </h2>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <!-- Identidad latinoamericana -->
+      <div class="animate-on-scroll text-center">
+        <div class="w-16 h-16 bg-naranja/10 rounded-2xl flex items-center justify-center mb-5 mx-auto">
+          <!-- Globe/map icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#EE6F01" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+            <path d="M2 12h20" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-verde-dark mb-2">Identidad latinoamericana</h3>
+        <p class="text-texto/80 text-sm leading-relaxed">
+          Revalorizar las tradiciones culturales, literarias e intelectuales
+          de América Latina.
+        </p>
+      </div>
+
+      <!-- Pensamiento crítico -->
+      <div class="animate-on-scroll text-center">
+        <div class="w-16 h-16 bg-amarillo/15 rounded-2xl flex items-center justify-center mb-5 mx-auto">
+          <!-- Brain/sparkles icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FCAE05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8" aria-hidden="true">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+            <path d="M20 4v.01" />
+            <path d="M22 2v.01" />
+            <path d="M20 2v.01" />
+            <path d="M22 4v.01" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-verde-dark mb-2">Pensamiento crítico</h3>
+        <p class="text-texto/80 text-sm leading-relaxed">
+          Promover la reflexión y el análisis profundo de las ideas, textos
+          y procesos culturales de América Latina.
+        </p>
+      </div>
+
+      <!-- Comunidad -->
+      <div class="animate-on-scroll text-center">
+        <div class="w-16 h-16 bg-verde-dark/10 rounded-2xl flex items-center justify-center mb-5 mx-auto">
+          <!-- Handshake/community icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#055B3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8" aria-hidden="true">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-verde-dark mb-2">Comunidad</h3>
+        <p class="text-texto/80 text-sm leading-relaxed">
+          Construir un espacio de encuentro donde las personas puedan compartir
+          lecturas, ideas y experiencias.
+        </p>
+      </div>
+
+      <!-- Diálogo -->
+      <div class="animate-on-scroll text-center">
+        <div class="w-16 h-16 bg-rojo/10 rounded-2xl flex items-center justify-center mb-5 mx-auto">
+          <!-- Message/dialogue icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#DC3601" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8" aria-hidden="true">
+            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+            <path d="M8 12h.01" />
+            <path d="M12 12h.01" />
+            <path d="M16 12h.01" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-verde-dark mb-2">Diálogo</h3>
+        <p class="text-texto/80 text-sm leading-relaxed">
+          Fomentar el intercambio respetuoso de perspectivas y la construcción
+          colectiva de conocimiento.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom wave -->
+  <div class="absolute bottom-0 left-0 w-full">
+    <WaveDivider fillColor="rgb(81 125 39 / 0.12)" variant="wave2" />
+  </div>
+</section>
