@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 
-interface FormData {
+interface ContactFormData {
   nombre: string;
   edad: number;
   pais: string;
@@ -9,6 +9,7 @@ interface FormData {
   telefono?: string;
   interes: string;
   encuentro?: string;
+  cv?: FileList;
 }
 
 const paises = [
@@ -50,28 +51,32 @@ export default function ContactForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<ContactFormData>();
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: ContactFormData) => {
     setSubmitting(true);
     setErrorMsg(null);
     try {
+      const formData = new FormData();
+      formData.append("access_key", "YOUR_ACCESS_KEY_HERE");
+      formData.append("subject", `Nuevo contacto de Amerandú — ${data.interes}`);
+      formData.append("from_name", "Amerandú Web");
+      formData.append("to", "ameranduclub@gmail.com");
+      formData.append("Nombre y Apellido", data.nombre);
+      formData.append("Edad", String(data.edad));
+      formData.append("País", data.pais);
+      formData.append("Correo electrónico", data.email);
+      formData.append("Teléfono", data.telefono || "No proporcionado");
+      formData.append("Interés", data.interes);
+      formData.append("Encuentro de interés", data.encuentro || "No especificado");
+
+      if (data.cv && data.cv.length > 0) {
+        formData.append("CV", data.cv[0]);
+      }
+
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          access_key: "YOUR_ACCESS_KEY_HERE",
-          subject: `Nuevo contacto de Amerandú — ${data.interes}`,
-          from_name: "Amerandú Web",
-          to: "ameranduclub@gmail.com",
-          "Nombre y Apellido": data.nombre,
-          Edad: data.edad,
-          País: data.pais,
-          "Correo electrónico": data.email,
-          Teléfono: data.telefono || "No proporcionado",
-          Interés: data.interes,
-          "Encuentro de interés": data.encuentro || "No especificado",
-        }),
+        body: formData,
       });
 
       if (response.ok) {
@@ -256,6 +261,32 @@ export default function ContactForm() {
             placeholder="Opcional"
             className={inputBase}
             {...register("encuentro")}
+          />
+        </div>
+
+        {/* CV Upload */}
+        <div className="sm:col-span-2">
+          <label htmlFor="cv" className={labelBase}>
+            Si deseás ser voluntario/a, agregá aquí tu CV
+          </label>
+          <label
+            htmlFor="cv"
+            className="group flex flex-col items-center justify-center w-full px-6 py-6 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 hover:border-verde-dark/40 hover:bg-verde-dark/5 transition-all duration-200 cursor-pointer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-gray-300 group-hover:text-verde-dark transition-colors mb-2" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            <span className="text-sm font-medium text-verde-dark">Seleccionar archivo</span>
+            <span className="text-xs text-gray-400 mt-1">PDF, DOC o DOCX — máx. 5 MB</span>
+          </label>
+          <input
+            id="cv"
+            type="file"
+            accept=".pdf,.doc,.docx"
+            className="hidden"
+            {...register("cv")}
           />
         </div>
       </div>
