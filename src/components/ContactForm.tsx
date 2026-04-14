@@ -58,7 +58,7 @@ export default function ContactForm() {
     setErrorMsg(null);
     try {
       const formData = new FormData();
-      formData.append("access_key", "YOUR_ACCESS_KEY_HERE");
+      formData.append("access_key", "0e00966e-4dbc-4cb9-928a-f35a70f8e1fa");
       formData.append("subject", `Nuevo contacto de Amerandú — ${data.interes}`);
       formData.append("from_name", "Amerandú Web");
       formData.append("to", "ameranduclub@gmail.com");
