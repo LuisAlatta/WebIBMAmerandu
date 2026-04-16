@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { href: "#inicio", label: "Inicio" },
-  { href: "#nosotros", label: "Nosotros" },
-  { href: "#club", label: "Club de lectura" },
-  { href: "#unete", label: "Únete" },
-  { href: "#faq", label: "FAQ" },
-  { href: "#contacto", label: "Contacto" },
+  { href: "/#inicio", label: "Inicio" },
+  { href: "/#nosotros", label: "Nosotros" },
+  { href: "/#club", label: "Club de lectura" },
+  { href: "/#unete", label: "Únete" },
+  { href: "/#faq", label: "FAQ" },
+  { href: "/#contacto", label: "Contacto" },
 ];
 
 export default function MobileMenu() {
@@ -49,7 +49,7 @@ export default function MobileMenu() {
             </a>
           ))}
           <a
-            href="#contacto"
+            href="/#contacto"
             onClick={() => setIsOpen(false)}
             className="mt-4 bg-rojo text-white text-center py-3 px-6 rounded-full font-semibold hover:bg-rojo/90 transition-colors"
           >
