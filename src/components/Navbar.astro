@@ -10,6 +10,7 @@ const { solid = false } = Astro.props;
 
 <header
   id="navbar"
+  data-solid={solid ? "true" : "false"}
   class={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${solid ? "bg-verde-dark shadow-lg" : "bg-transparent"}`}
 >
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
