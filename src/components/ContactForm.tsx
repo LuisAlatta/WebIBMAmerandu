@@ -75,7 +75,7 @@ export default function ContactForm() {
       formData.append("Encuentro de interés", data.encuentro || "No especificado");
 
       if (data.cv && data.cv.length > 0) {
-        formData.append("attachment", data.cv[0]);
+        formData.append("Curriculum_CV", data.cv[0]);
       }
 
       const response = await fetch("https://formsubmit.co/ameranduclub@gmail.com", {
