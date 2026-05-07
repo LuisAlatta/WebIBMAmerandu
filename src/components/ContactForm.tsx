@@ -78,8 +78,9 @@ export default function ContactForm() {
         formData.append("attachment", data.cv[0]);
       }
 
-      const response = await fetch("https://formsubmit.co/ajax/ameranduclub@gmail.com", {
+      const response = await fetch("https://formsubmit.co/ameranduclub@gmail.com", {
         method: "POST",
+        headers: { Accept: "application/json" },
         body: formData,
       });
 
