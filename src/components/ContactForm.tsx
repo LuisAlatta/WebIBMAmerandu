@@ -50,18 +50,22 @@ export default function ContactForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<ContactFormData>();
+
+  const cvFiles = watch("cv");
+  const selectedFileName = cvFiles && cvFiles.length > 0 ? cvFiles[0].name : null;
 
   const onSubmit = async (data: ContactFormData) => {
     setSubmitting(true);
     setErrorMsg(null);
     try {
       const formData = new FormData();
-      formData.append("access_key", "0e00966e-4dbc-4cb9-928a-f35a70f8e1fa");
-      formData.append("subject", `Nuevo contacto de Amerandú — ${data.interes}`);
-      formData.append("from_name", "Amerandú Web");
-      formData.append("to", "ameranduclub@gmail.com");
+      formData.append("_subject", `Nuevo contacto de Amerandú — ${data.interes}`);
+      formData.append("_cc", "newluisalatta@gmail.com");
+      formData.append("_template", "table");
+      formData.append("_captcha", "false");
       formData.append("Nombre y Apellido", data.nombre);
       formData.append("Edad", String(data.edad));
       formData.append("País", data.pais);
@@ -71,10 +75,10 @@ export default function ContactForm() {
       formData.append("Encuentro de interés", data.encuentro || "No especificado");
 
       if (data.cv && data.cv.length > 0) {
-        formData.append("CV", data.cv[0]);
+        formData.append("attachment", data.cv[0]);
       }
 
-      const response = await fetch("https://api.web3forms.com/submit", {
+      const response = await fetch("https://formsubmit.co/ajax/ameranduclub@gmail.com", {
         method: "POST",
         body: formData,
       });
@@ -271,15 +275,34 @@ export default function ContactForm() {
           </label>
           <label
             htmlFor="cv"
-            className="group flex flex-col items-center justify-center w-full px-6 py-6 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 hover:border-verde-dark/40 hover:bg-verde-dark/5 transition-all duration-200 cursor-pointer"
+            className={`group flex flex-col items-center justify-center w-full px-6 py-6 rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer ${
+              selectedFileName
+                ? "border-verde-dark/40 bg-verde-dark/5"
+                : "border-gray-200 bg-gray-50/50 hover:border-verde-dark/40 hover:bg-verde-dark/5"
+            }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-gray-300 group-hover:text-verde-dark transition-colors mb-2" aria-hidden="true">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-            <span className="text-sm font-medium text-verde-dark">Seleccionar archivo</span>
-            <span className="text-xs text-gray-400 mt-1">PDF, DOC o DOCX — máx. 5 MB</span>
+            {selectedFileName ? (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#055B3D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 mb-2" aria-hidden="true">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <polyline points="16 13 12 17 8 13" />
+                  <line x1="12" y1="12" x2="12" y2="17" />
+                </svg>
+                <span className="text-sm font-semibold text-verde-dark truncate max-w-full">{selectedFileName}</span>
+                <span className="text-xs text-verde-dark/60 mt-1">Clic para cambiar archivo</span>
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-gray-300 group-hover:text-verde-dark transition-colors mb-2" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                <span className="text-sm font-medium text-verde-dark">Seleccionar archivo</span>
+                <span className="text-xs text-gray-400 mt-1">PDF, DOC o DOCX — máx. 5 MB</span>
+              </>
+            )}
           </label>
           <input
             id="cv"
