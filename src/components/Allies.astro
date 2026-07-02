@@ -1,0 +1,41 @@
+---
+import { Image } from "astro:assets";
+import WaveDivider from "./WaveDivider.astro";
+import logoIMB from "../assets/images/imb-logo.avif";
+import logoMunay from "../assets/images/munay-ruray.avif";
+---
+
+<section id="aliados" class="relative bg-white pt-20 pb-48 md:pt-28 md:pb-60 overflow-hidden">
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+    <div class="text-center mb-14 animate-on-scroll">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-verde-dark mb-4">
+        Nuestros aliados
+      </h2>
+      <p class="text-texto/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+        Trabajamos en colaboración con organizaciones, editoriales e instituciones que impulsan el desarrollo de la cultura, la literatura y el pensamiento crítico en nuestra región.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-8 md:gap-16 max-w-2xl mx-auto items-center justify-items-center animate-on-scroll">
+      <div class="p-6 sm:p-8 hover:scale-105 transition-all duration-300 flex items-center justify-center aspect-square w-full max-w-60">
+        <Image 
+          src={logoIMB} 
+          alt="IMB - Aliado de Amerandú" 
+          class="w-full h-full object-contain mix-blend-multiply"
+        />
+      </div>
+      <div class="p-6 sm:p-8 hover:scale-105 transition-all duration-300 flex items-center justify-center  aspect-square w-full max-w-60">
+        <Image 
+          src={logoMunay} 
+          alt="Fundación Sabiduría - Aliado de Amerandú" 
+          class="w-full h-full object-contain mix-blend-multiply"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom wave transition to Book Club (bg-verde-medio/12) -->
+  <div class="absolute bottom-0 left-0 w-full">
+    <WaveDivider fillColor="rgb(81 125 39 / 0.12)" variant="wave2" />
+  </div>
+</section>
