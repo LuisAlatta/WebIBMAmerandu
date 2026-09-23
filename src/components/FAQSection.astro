@@ -1,31 +1,58 @@
 ---
 import FAQ from "./FAQ";
 import WaveDivider from "./WaveDivider.astro";
+import "../styles/landing-sections.css";
 ---
 
-<section id="faq" class="relative bg-crema pt-20 pb-48 md:pt-28 md:pb-60 overflow-hidden">
-  <!-- Decorative cultural elements -->
-  <img
-    src="/images/elementos-decorativos.png"
-    alt=""
-    aria-hidden="true"
-    class="absolute -left-12 top-12 w-44 md:w-56 opacity-[0.05] pointer-events-none -scale-x-100"
-    loading="lazy"
-  />
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12 animate-on-scroll">
-      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-verde-dark mb-4">
-        Preguntas frecuentes
-      </h2>
+<section id="faq" class="landing-section faq-section" aria-labelledby="faq-title">
+  <div class="section-inner faq-layout">
+    <div class="faq-heading">
+      <p class="section-kicker">¿Todavía tienes dudas?</p>
+      <h2 id="faq-title" class="section-title">Preguntas<br />frecuentes</h2>
     </div>
-
-    <div class="animate-on-scroll">
+    <div class="faq-panel">
+      <div class="faq-dots" aria-hidden="true"></div>
       <FAQ client:visible />
     </div>
   </div>
-
-  <!-- Bottom wave -->
-  <div class="absolute bottom-0 left-0 w-full">
+  <div class="section-wave" aria-hidden="true">
     <WaveDivider fillColor="#055B3D" variant="wave2" />
   </div>
 </section>
+
+<style>
+  .faq-section { background: white; padding-block: 145px 150px; }
+  .faq-layout { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 2fr); gap: 80px; align-items: start; }
+  .faq-heading { color: var(--color-verde-dark); }
+  .faq-heading .section-kicker { gap: 16px; margin-bottom: 22px; white-space: nowrap; }
+  .faq-heading .section-title { font-size: clamp(2rem, 3.3vw, 3.25rem); }
+  .faq-panel { position: relative; min-width: 0; }
+  .faq-dots { position: absolute; top: -40px; right: -55px; width: 380px; height: 230px; background-image: radial-gradient(var(--color-verde-dark) 2px, transparent 2.5px); background-size: 25px 25px; opacity: .1; pointer-events: none; }
+  .faq-panel :global(.faq-accordion) { position: relative; overflow: hidden; border: 1px solid var(--section-mustard); border-radius: 44px; background: var(--section-cream); box-shadow: 0 4px 4px rgb(0 0 0 / .22); }
+  .faq-panel :global(.faq-item + .faq-item) { border-top: 1px solid var(--section-mustard); }
+  .faq-panel :global(.faq-question) { display: flex; align-items: center; justify-content: space-between; gap: 24px; width: 100%; min-height: 92px; padding: 28px 32px; color: var(--color-texto); text-align: left; font-size: 20px; font-weight: 500; line-height: 1.35; cursor: pointer; transition: background-color .2s ease; }
+  .faq-panel :global(.faq-question:hover) { background: rgb(252 174 5 / .08); }
+  .faq-panel :global(.faq-question:focus-visible) { outline: 3px solid var(--color-verde-dark); outline-offset: -5px; border-radius: 12px; }
+  .faq-panel :global(.faq-chevron) { width: 18px; height: 18px; flex-shrink: 0; transition: transform 420ms var(--motion-ease); }
+  .faq-panel :global(.faq-question[aria-expanded="true"] .faq-chevron) { transform: rotate(180deg); }
+  .faq-panel :global(.faq-answer) { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 420ms var(--motion-ease), opacity 320ms var(--motion-ease); color: #505050; font-size: 16px; line-height: 1.6; }
+  .faq-panel :global(.faq-answer[data-open="true"]) { grid-template-rows: 1fr; opacity: 1; }
+  .faq-panel :global(.faq-answer-inner) { min-height: 0; overflow: hidden; }
+  .faq-panel :global(.faq-answer-inner p) { padding: 0 32px 28px; }
+  @media (max-width: 1100px) { .faq-layout { gap: 40px; } .faq-heading .section-kicker { font-size: 12px; } }
+  @media (max-width: 900px) {
+    .faq-section { padding-block: 85px 110px; }
+    .faq-layout { grid-template-columns: 1fr; gap: 40px; }
+    .faq-heading { max-width: 420px; }
+    .faq-heading .section-kicker { font-size: 14px; }
+  }
+  @media (max-width: 639px) {
+    .faq-section { padding-block: 65px 90px; }
+    .faq-panel :global(.faq-accordion) { border-radius: 28px; }
+    .faq-panel :global(.faq-question) { min-height: 90px; padding: 24px 20px; gap: 16px; font-size: 16px; }
+    .faq-panel :global(.faq-answer) { font-size: 15px; }
+    .faq-panel :global(.faq-answer-inner p) { padding: 0 20px 24px; }
+    .faq-dots { width: 230px; right: -25px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .faq-panel :global(.faq-question), .faq-panel :global(.faq-chevron), .faq-panel :global(.faq-answer) { transition: none; } }
+</style>

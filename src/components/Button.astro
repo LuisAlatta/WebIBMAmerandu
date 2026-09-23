@@ -1,0 +1,13 @@
+---
+import { ArrowRight } from "lucide-react";
+interface Props { href?: string; variant?: "primary" | "secondary"; compact?: boolean; }
+const { href = "#contacto", variant = "primary", compact = false } = Astro.props;
+---
+<a href={href} class:list={["club-button inline-flex items-center gap-3 text-white px-8 py-4 rounded-full text-lg font-semibold transition-[background-color,translate] duration-200 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-0 motion-reduce:transition-none", variant === "secondary" ? "secondary bg-verde-dark hover:bg-[#044f35]" : "bg-rojo hover:bg-[#c23001]", { compact }]}>
+  <slot /><ArrowRight size={19} aria-hidden="true" />
+</a>
+<style>
+  .club-button { max-width: 100%; }
+  .club-button:focus-visible { outline: 3px solid var(--color-verde-dark); outline-offset: 5px; }
+  .club-button.compact { padding: .85rem 1.5rem; font-size: .875rem; }
+</style>

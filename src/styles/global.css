@@ -8,7 +8,7 @@
   --color-rojo: #DC3601;
   --color-crema: #FFFDF7;
   --color-texto: #1A1A1A;
-  --color-footer-bg: #032A1D;
+  --color-footer-bg: #00472E;
 
   --font-sans: "Montserrat", sans-serif;
 }
@@ -21,18 +21,6 @@ body {
   font-family: var(--font-sans);
   color: var(--color-texto);
   background-color: var(--color-crema);
-}
-
-/* Scroll animations */
-.animate-on-scroll {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
-}
-
-.animate-on-scroll.is-visible {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 /* WhatsApp pulse */
@@ -53,6 +41,6 @@ body {
   inset: -6px;
   border-radius: 50%;
   background: #25D366;
-  animation: pulse-ring 2s ease-out infinite;
+  animation: pulse-ring 3.6s var(--motion-ease, ease-out) 2;
   z-index: -1;
 }

@@ -1,41 +1,70 @@
 ---
-import { Image } from "astro:assets";
-import WaveDivider from "./WaveDivider.astro";
-import logoIMB from "../assets/images/imb-logo.avif";
-import logoMunay from "../assets/images/munay-ruray.avif";
+import { ArrowRight } from "lucide-react";
+import "../styles/landing-sections.css";
+interface Props { munayLogo?: string; imbLogo?: string; munayHref?: string; imbHref?: string; }
+const { munayLogo, imbLogo, munayHref = "#contacto", imbHref = "#contacto" } = Astro.props;
+const allies = [
+  { name: "Munay Ruray", logo: munayLogo, href: munayHref, text: "Programa de voluntariado que promueve la participación de jóvenes en iniciativas sociales y de desarrollo comunitario.", shape: "M8 138C10 46 130 8 249 8S521 28 577 69C600 86 514 204 510 243S607 362 573 381C535 414 277 374 118 360S0 223 8 138Z" },
+  { name: "IMB", logo: imbLogo, href: imbHref, text: "Institución dedicada a la formación profesional y empresarial, con enfoque en innovación, tecnología y desarrollo de talento.", shape: "M121 29C171 8 526-5 566 29S606 322 568 358S344 396 227 393C121 385 41 301 8 226C36 161 91 45 121 29Z" },
+];
 ---
-
-<section id="aliados" class="relative bg-white pt-20 pb-48 md:pt-28 md:pb-60 overflow-hidden">
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-    <div class="text-center mb-14 animate-on-scroll">
-      <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-verde-dark mb-4">
-        Nuestros aliados
-      </h2>
-      <p class="text-texto/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-        Trabajamos en colaboración con organizaciones, editoriales e instituciones que impulsan el desarrollo de la cultura, la literatura y el pensamiento crítico en nuestra región.
-      </p>
+<section id="aliados" class="landing-section allies" aria-labelledby="allies-title">
+  {[false, true].map((flipped) => <svg class:list={["contours", { flipped }]} viewBox="0 0 300 550" fill="none" stroke="currentColor" stroke-width=".65" aria-hidden="true">{Array.from({length: 8}, (_, i) => <path d={`M${35 + i * 29} -50C${-65 + i * 29} 80 ${115 + i * 23} 144 ${12 + i * 25} 235S${-78 + i * 27} 377 ${-40 + i * 28} 600`} />)}</svg>)}
+  <div class="section-inner">
+    <div class="allies-heading"><p class="section-kicker centered">Nuestros aliados</p><h2 id="allies-title" class="section-title">Crecemos en comunidad</h2><p class="intro">Trabajamos en colaboración con organizaciones que impulsan el desarrollo de la cultura, la literatura y el pensamiento crítico en nuestra región.</p></div>
+    <div class="allies-grid">
+      {allies.map(({name, logo, href, text, shape}) => <article class="ally-card">
+        <svg class="ally-shape" viewBox="0 0 610 410" preserveAspectRatio="none" aria-hidden="true"><path d={shape} fill="currentColor" stroke="white" stroke-width="5" /></svg>
+        <div class="ally-content">
+          <div class="logo-space">{logo ? <img src={logo} alt={name} loading="lazy" /> : <span class:list={["logo-placeholder", { imb: name === "IMB" }]}>{name}</span>}</div>
+          <p>{text}</p>
+          <!-- Replace the href prop when the ally's definitive URL is available. -->
+          <a href={href} aria-label={`Conoce más sobre ${name}`}>Conoce más <ArrowRight size={19} aria-hidden="true" /></a>
+        </div>
+      </article>)}
     </div>
-
-    <div class="grid grid-cols-2 gap-8 md:gap-16 max-w-2xl mx-auto items-center justify-items-center animate-on-scroll">
-      <div class="p-6 sm:p-8 hover:scale-105 transition-all duration-300 flex items-center justify-center aspect-square w-full max-w-60">
-        <Image 
-          src={logoIMB} 
-          alt="IMB - Aliado de Amerandú" 
-          class="w-full h-full object-contain mix-blend-multiply"
-        />
-      </div>
-      <div class="p-6 sm:p-8 hover:scale-105 transition-all duration-300 flex items-center justify-center  aspect-square w-full max-w-60">
-        <Image 
-          src={logoMunay} 
-          alt="Fundación Sabiduría - Aliado de Amerandú" 
-          class="w-full h-full object-contain mix-blend-multiply"
-        />
-      </div>
-    </div>
-  </div>
-
-  <!-- Bottom wave transition to Book Club (bg-verde-medio/12) -->
-  <div class="absolute bottom-0 left-0 w-full">
-    <WaveDivider fillColor="rgb(81 125 39 / 0.12)" variant="wave2" />
   </div>
 </section>
+<style>
+  .allies { background: white; padding-block: 90px 135px; }
+  .allies-heading { text-align: center; color: var(--section-mustard); }
+  .intro { max-width: 860px; margin: 26px auto 0; font-size: 20px; line-height: 1.25; color: var(--color-texto); }
+  .allies-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 50px; }
+  .ally-card { position: relative; min-height: 410px; display: grid; place-items: center; }
+  .ally-shape { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--section-cream); filter: drop-shadow(0 4px 2px rgb(0 0 0 / .25)); overflow: visible; }
+  .ally-card:nth-child(2) .ally-shape { color: var(--section-coral); }
+  .ally-content { position: relative; width: 100%; text-align: center; padding-block: 40px 55px; padding-inline: 8em;  }
+  .allies-grid > .ally-card:first-child .ally-content { padding-inline: 3em 8em}
+  .ally-card:nth-child(2) .ally-content { margin-left: 35px; }
+  .logo-space { height: 125px; display: grid; place-items: center; margin-bottom: 24px; }
+  .logo-space img { width: 100%; height: 100%; object-fit: contain; max-width: 270px; }
+  .logo-placeholder { display: block; max-width: 230px; font-size: 43px; font-weight: 600; color: var(--section-mustard); line-height: 1; }
+  .logo-placeholder.imb { font-size: 100px; font-weight: 800; color: #761713; }
+  .ally-content p { font-size: 16px; line-height: 1.2; letter-spacing: .025em; }
+  a { display: inline-flex; align-items: center; gap: 10px; margin-top: 32px; font-size: 16px; font-weight: 700; }
+  a:hover { color: var(--color-verde-dark); }
+  a:focus-visible { outline: 2px solid var(--color-verde-dark); outline-offset: 5px; border-radius: 3px; }
+  .contours { position: absolute; width: 260px; height: 550px; top: -65px; left: -65px; color: #d5d5d5; pointer-events: none; }
+  .contours.flipped { inset: auto -65px -90px auto; transform: rotate(180deg); }
+  @media (max-width: 1199px) {
+    .ally-content { padding-inline: 16%; }
+    .ally-card:nth-child(2) .ally-content {
+      margin-left: 0;
+      padding-inline: 22% 10%;
+    }
+  }
+  @media (max-width: 800px) {
+    .allies-grid { grid-template-columns: 1fr; max-width: 600px; margin-inline: auto; gap: 30px; }
+  }
+  @media (max-width: 639px) {
+    .allies { padding-block: 65px 95px; }
+    .intro { font-size: 16px; }
+    .ally-card { min-height: 360px; }
+    .ally-content { padding-block: 35px; padding-inline: 14% 18%; }
+    .allies-grid > .ally-card:first-child .ally-content { padding-inline: 2em 5em }
+    .logo-space { height: 90px; }
+    .logo-placeholder { font-size: 34px; }
+    .logo-placeholder.imb { font-size: 76px; }
+    .ally-content p { font-size: 14px; }
+  }
+</style>

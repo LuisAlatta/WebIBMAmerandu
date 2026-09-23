@@ -1,0 +1,26 @@
+/* Shared only by the five redesigned landing sections. */
+.landing-section {
+  --section-cream: #fff5dd;
+  --section-coral: #ffcfbf;
+  --section-mint: #cef3e7;
+  --section-terracotta: #bd3004;
+  --section-mustard: #d89400;
+  position: relative;
+  overflow: hidden;
+  scroll-margin-top: 80px;
+}
+.landing-section .section-inner { width: min(100% - 64px, 1200px); margin-inline: auto; position: relative; z-index: 1; }
+.landing-section .section-kicker { display: flex; align-items: center; gap: 18px; font-size: 16px; font-weight: 700; text-transform: uppercase; margin-bottom: 20px; }
+.landing-section .section-kicker::after { content: ""; height: 2px; flex: 1; background: currentColor; }
+.landing-section .section-kicker.centered { max-width: 760px; margin-inline: auto; justify-content: center; }
+.landing-section .section-kicker.centered::before { content: ""; height: 2px; flex: 1; background: currentColor; }
+.landing-section .section-title { font-size: clamp(2rem, 3.6vw, 3.5rem); font-weight: 750; line-height: 1.08; text-transform: uppercase; letter-spacing: -.025em; }
+.landing-section .section-wave { position: absolute; bottom: -1px; left: 0; width: 100%; pointer-events: none; }
+.landing-section .section-wave svg { height: 48px; }
+.landing-section .section-leaves { position: absolute; width: 160px; pointer-events: none; }
+@media (max-width: 639px) {
+  .landing-section .section-inner { width: calc(100% - 40px); }
+  .landing-section .section-kicker { font-size: 12px; gap: 12px; }
+  .landing-section .section-leaves { width: 90px; opacity: .35; }
+  .landing-section .section-wave svg { height: 30px; }
+}

@@ -1,0 +1,129 @@
+---
+import { ArrowRight } from "lucide-react";
+import Button from "./Button.astro";
+import MediaButton from "./MediaButton.astro";
+import SpotifyEmbed from "./SpotifyEmbed.astro";
+import WaveDivider from "./WaveDivider.astro";
+import plantas from "../assets/images/plantas-5.svg";
+import "../styles/landing-sections.css";
+
+interface Event {
+  day: string;
+  month: string;
+  title: string;
+  description: string;
+}
+
+interface Props {
+  spotifyHref?: string;
+  youtubeHref?: string;
+  scheduleHref?: string;
+  events?: Event[];
+}
+
+const spotifyEpisodeId = "1GrkBKP4naK69Eketzn9qi";
+
+// Placeholder content from the reference, ready for the definitive schedule.
+const {
+  spotifyHref = `https://open.spotify.com/episode/${spotifyEpisodeId}`,
+  youtubeHref = 'https://www.youtube.com/@Amerandu',
+  scheduleHref,
+  events = Array.from({ length: 4 }, () => ({
+    day: "15",
+    month: "Mayo",
+    title: "Lorem ipsum",
+    description: "Lorem ipsum ornare nunc rhoncus fermentum eget arcu sed pharetra at semper odio orci sapien",
+  })),
+} = Astro.props;
+---
+
+<section id="nuevas-miradas" class="landing-section beyond-books" aria-labelledby="beyond-books-title">
+  <div class="plants-decoration" aria-hidden="true">
+    <div class="plant-top" style={{ backgroundImage: `url("${plantas.src}")` }}></div>
+  </div>
+  <div class="section-inner">
+    <div class="section-heading">
+      <p class="section-kicker">Nuevas miradas</p>
+      <h2 id="beyond-books-title" class="section-title">Más allá de los libros</h2>
+      <p class="intro">Conversamos, aprendemos y compartimos ideas sobre Latinoamérica a través de podcasts, webinars y seminarios.</p>
+    </div>
+
+    <div class="content-grid">
+      <article class="content-card" aria-labelledby="podcast-title">
+        <p class="section-kicker">Podcast</p>
+        <h3 id="podcast-title">Conversaciones que nos acercan</h3>
+        <p class="card-description">Un espacio para escuchar voces, ideas y experiencias que nos ayudan a mirar Latinoamérica desde nuevas perspectivas.</p>
+        <SpotifyEmbed episodeId={spotifyEpisodeId} />
+        <div class="platform-buttons">
+          <MediaButton platform="spotify" href={spotifyHref} />
+          <MediaButton platform="youtube" href={youtubeHref} />
+        </div>
+      </article>
+
+      <article class="content-card webinars-card" aria-labelledby="webinars-title">
+        <p class="section-kicker">Webinars y seminarios</p>
+        <h3 id="webinars-title">Encuentros para seguir aprendiendo</h3>
+        <p class="card-description">Espacios de conversación y aprendizaje junto a personas que comparten nuestro interés por Latinoamérica.</p>
+        <ul class="events">
+          {events.map(({ day, month, title, description }) => (
+            <li class="event">
+              <div class="event-date"><span>{day}</span><span>{month}</span></div>
+              <div class="event-copy"><h4>{title}</h4><p>{description}</p></div>
+            </li>
+          ))}
+        </ul>
+        <div class="schedule-link">
+          {scheduleHref ? (
+            <Button variant="secondary" href={scheduleHref}>Conoce el cronograma completo</Button>
+          ) : (
+            <button class="schedule-placeholder" type="button" disabled title="Cronograma completo: próximamente">
+              Conoce el cronograma completo <ArrowRight size={19} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      </article>
+    </div>
+  </div>
+  <div class="section-wave" aria-hidden="true"><WaveDivider fillColor="#FFFFFF" variant="wave1" /></div>
+</section>
+
+<style>
+  .beyond-books { background: var(--section-coral); padding-block: 95px 145px; }
+  .section-heading { max-width: 720px; margin-bottom: 48px; color: var(--section-terracotta); }
+  .section-heading .section-title { font-size: clamp(2rem, 3.4vw, 3rem); }
+  .intro { max-width: 690px; margin-top: 24px; font-size: 18px; line-height: 1.25; color: var(--color-texto); }
+  .content-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .content-card { display: flex; flex-direction: column; min-width: 0; padding: 32px; border-radius: 22px; background: #f8f8f8; }
+  .content-card .section-kicker { margin-bottom: 18px; }
+  h3 { font-size: clamp(1.65rem, 2.5vw, 2.25rem); font-weight: 750; line-height: 1.05; text-transform: uppercase; letter-spacing: -.025em; }
+  .card-description { margin-block: 24px; font-size: 18px; line-height: 1.2; }
+  .platform-buttons { display: grid; gap: 16px; margin-top: 24px; }
+  .events { display: grid; gap: 24px; }
+  .event { display: grid; grid-template-columns: 30% minmax(0, 1fr); gap: 16px; align-items: start; }
+  .event-date { display: flex; flex-direction: column; justify-content: center; min-height: 72px; padding: 12px; border-radius: 12px; background: var(--section-cream); font-size: 18px; font-weight: 700; line-height: 1; text-align: center; }
+  .event-copy h4 { margin-bottom: 8px; font-size: 18px; font-weight: 700; line-height: 1.1; text-transform: uppercase; }
+  .event-copy p { font-size: 14px; line-height: 1.1; letter-spacing: .035em; color: #505050; }
+  .schedule-link { margin-top: auto; padding-top: 55px; }
+  .schedule-link :global(.club-button), .schedule-placeholder { display: flex; justify-content: center; align-items: center; gap: 12px; width: 100%; min-height: 64px; text-align: center; }
+  .schedule-placeholder { padding: 16px 24px; border-radius: 999px; background: var(--color-verde-dark); color: white; font-size: 18px; font-weight: 700; line-height: 1.25; }
+  .schedule-placeholder :global(svg) { flex-shrink: 0; }
+  .plants-decoration { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .plant-top { position: absolute; left: 0; top: 0; width: 250px; height: 100%; background-repeat: no-repeat; background-size: contain; background-position: left top; }
+  @media (max-width: 1000px) {
+    .content-grid { grid-template-columns: 1fr; max-width: 650px; margin-inline: auto; }
+    .plant-top { width: 180px; }
+  }
+  @media (max-width: 639px) {
+    .beyond-books { padding-block: 65px 95px; }
+    .section-heading { margin-bottom: 32px; }
+    .intro, .card-description { font-size: 16px; }
+    .content-card { padding: 24px 20px; border-radius: 18px; }
+    .content-card .section-kicker { font-size: 12px; gap: 10px; }
+    .event { grid-template-columns: 72px minmax(0, 1fr); gap: 12px; }
+    .event-copy h4 { font-size: 16px; }
+    .event-copy p { line-height: 1.25; letter-spacing: 0; }
+    .schedule-link { padding-top: 32px; }
+    .schedule-placeholder, .schedule-link :global(.club-button) { padding-inline: 18px; font-size: 15px; }
+    .plant-top { width: 90px; opacity: .35; }
+  }
+</style>

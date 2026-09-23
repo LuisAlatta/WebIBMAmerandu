@@ -8,7 +8,7 @@ Sitio web de **Amerandú**, un espacio para leer, dialogar y reflexionar sobre l
 
 - Landing de una sola página con secciones de presentación, misión y visión, valores y club de lectura.
 - Sección de preguntas frecuentes (FAQ) interactiva.
-- Formulario de contacto y de voluntariado con carga de CV.
+- Formulario de contacto y voluntariado integrado con mail-gateway (CV por correo separado).
 - Botón directo de WhatsApp.
 - Página de políticas de privacidad.
 - Diseño responsive y optimizado para SEO.
@@ -43,6 +43,8 @@ Todos se ejecutan desde la raíz del proyecto:
 | `npm run dev` | Servidor de desarrollo en `localhost:4321` |
 | `npm run build` | Compila el sitio de producción en `./dist/` |
 | `npm run preview` | Previsualiza la compilación localmente |
+| `npm run preview:cloudflare` | Sirve `dist/` y la API de correo con Wrangler |
+| `npm test` | Ejecuta las pruebas existentes de la API con respuestas simuladas |
 | `npm run astro ...` | Ejecuta comandos del CLI de Astro |
 
 ## Estructura
@@ -61,3 +63,36 @@ amerandu-web/
 ## Despliegue
 
 El proyecto está preparado para desplegarse en **Cloudflare**. La compilación de producción se genera con `npm run build` y se sirve el contenido de `./dist/`.
+
+### Correo del formulario
+
+El formulario llama a `/api/contact`, implementado como Pages Function en
+`functions/api/contact.ts`. Esta función envía el correo mediante `POST /send`
+del mail-gateway. El token permanece en el servidor. El destinatario activo es
+`test@imbinstitute.com`, definido en el campo `to` de la función; el email del solicitante
+se incluye en el contenido (la API proporcionada no documenta `replyTo`).
+
+Configura en `.env` las variables de `.env.example`: `MAIL_GATEWAY_URL`
+(URL base o URL terminada en `/send`), `MAIL_GATEWAY_TOKEN` y
+`MAIL_GATEWAY_FROM` (remitente autorizado por el gateway).
+Para probar el formulario localmente:
+
+```sh
+npm run build
+npm run preview:cloudflare
+```
+
+Wrangler carga `.env`; si existe `.dev.vars`, este tiene prioridad.
+`npm run dev` y `npm run preview` ejecutan solo Astro, sin Pages Functions.
+En Cloudflare Pages configura las mismas variables para producción y preview,
+guardando el token como secreto, y vuelve a desplegar. Despliega mediante la
+integración Git de Pages o `wrangler pages deploy dist` desde la raíz del proyecto
+para incluir `functions/`; subir solo los archivos estáticos no incluye la API.
+
+El contrato del gateway compartido no incluye adjuntos. Si se selecciona un CV,
+el formulario pide retirarlo y enviarlo por correo, sin descartarlo silenciosamente.
+
+## Guía de mantenimiento
+
+Consulta [docs/arquitectura.md](docs/arquitectura.md) para conocer los archivos
+compartidos, la navegación por pestañas, las animaciones y el flujo de correo.

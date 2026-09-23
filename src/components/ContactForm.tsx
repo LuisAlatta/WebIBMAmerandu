@@ -1,337 +1,347 @@
+/**
+ * Isla React de club/voluntariado, hidratada con client:visible en ContactSection.
+ * React Hook Form valida los campos; intl-tel-input normaliza el teléfono.
+ * Los hashes contact-tab-* seleccionan la pestaña desde cualquier CTA de la web.
+ * Solo envía datos a /api/contact: remitente, destinatarios y token viven en servidor.
+ * El CV permanece en el dispositivo: su envío se bloquea hasta que el gateway
+ * disponga de un contrato para adjuntos. Un fallo conserva los datos del usuario.
+ */
+import { Fragment, useEffect, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { ArrowRight, ArrowUpToLine, Check } from "lucide-react";
+import intlTelInput from "intl-tel-input";
+import type { Iso2, Iti } from "intl-tel-input";
+import { es as spanish } from "intl-tel-input/locale";
+import "intl-tel-input/styles";
+import "../styles/contact-form.css";
 
+type FormType = "club" | "volunteer";
 interface ContactFormData {
   nombre: string;
-  edad: number;
   pais: string;
   email: string;
-  telefono?: string;
-  interes: string;
-  encuentro?: string;
+  telefono: string;
+  edad?: number;
+  experiencia?: string;
   cv?: FileList;
 }
 
-const paises = [
-  "Argentina",
-  "Bolivia",
-  "Brasil",
-  "Chile",
-  "Colombia",
-  "Costa Rica",
-  "Cuba",
-  "Ecuador",
-  "El Salvador",
-  "Guatemala",
-  "Haití",
-  "Honduras",
-  "México",
-  "Nicaragua",
-  "Panamá",
-  "Paraguay",
-  "Perú",
-  "Puerto Rico",
-  "República Dominicana",
-  "Uruguay",
-  "Venezuela",
-  "Otro",
+const countries: Array<{ name: string; code: Iso2 }> = [
+  { name: "Argentina", code: "ar" },
+  { name: "Bolivia", code: "bo" },
+  { name: "Brasil", code: "br" },
+  { name: "Chile", code: "cl" },
+  { name: "Colombia", code: "co" },
+  { name: "Costa Rica", code: "cr" },
+  { name: "Cuba", code: "cu" },
+  { name: "Ecuador", code: "ec" },
+  { name: "El Salvador", code: "sv" },
+  { name: "Guatemala", code: "gt" },
+  { name: "Haití", code: "ht" },
+  { name: "Honduras", code: "hn" },
+  { name: "México", code: "mx" },
+  { name: "Nicaragua", code: "ni" },
+  { name: "Panamá", code: "pa" },
+  { name: "Paraguay", code: "py" },
+  { name: "Perú", code: "pe" },
+  { name: "Puerto Rico", code: "pr" },
+  { name: "República Dominicana", code: "do" },
+  { name: "Uruguay", code: "uy" },
+  { name: "Venezuela", code: "ve" },
+];
+const tabs = [
+  { value: "club" as const, label: "Quiero unirme al club" },
+  { value: "volunteer" as const, label: "Quiero ser voluntario" },
 ];
 
-const inputBase =
-  "w-full px-4 py-3 rounded-2xl border border-gray-200 bg-white text-texto placeholder:text-gray-400 focus:outline-none focus:border-amarillo focus:ring-2 focus:ring-amarillo/30 transition-all duration-200";
-const labelBase = "block text-sm font-semibold text-verde-dark mb-1.5";
-const errorBase = "text-rojo text-xs mt-1";
-
 export default function ContactForm() {
+  const [formType, setFormType] = useState<FormType>("volunteer");
   const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const phoneInput = useRef<HTMLInputElement | null>(null);
+  const phoneInstance = useRef<Iti | null>(null);
+  const successHeading = useRef<HTMLHeadingElement | null>(null);
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const submittingRef = useRef(false);
+  const volunteer = formType === "volunteer";
+  const { register, handleSubmit, watch, setValue, clearErrors, reset, formState: { errors, isSubmitting } } =
+    useForm<ContactFormData>({ shouldUnregister: true, defaultValues: { nombre: "", email: "", telefono: "", pais: "" } });
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<ContactFormData>();
+  useEffect(() => {
+    const input = phoneInput.current;
+    if (!input || submitted) return;
+    const instance = intlTelInput(input, {
+      initialCountry: "pe",
+      separateDialCode: true,
+      showFlags: true,
+      countryNameLocale: "es",
+      uiTranslations: spanish,
+      loadUtils: () => import("intl-tel-input/utils"),
+    });
+    phoneInstance.current = instance;
+    // Handle a loading failure during validation rather than allowing an unhandled rejection.
+    void instance.promise.catch(() => {});
+    const syncCountry = () => setValue("telefono", input.value, { shouldValidate: false });
+    input.addEventListener("countrychange", syncCountry);
+    return () => {
+      input.removeEventListener("countrychange", syncCountry);
+      instance.destroy();
+      phoneInstance.current = null;
+    };
+  }, [submitted, setValue]);
 
-  const cvFiles = watch("cv");
-  const selectedFileName = cvFiles && cvFiles.length > 0 ? cvFiles[0].name : null;
+  useEffect(() => {
+    submittingRef.current = isSubmitting;
+    phoneInstance.current?.setDisabled(isSubmitting);
+  }, [isSubmitting]);
+
+  useEffect(() => {
+    const selectLinkedForm = (hash: string) => {
+      const next = hash === "#contact-tab-club" ? "club"
+        : hash === "#contact-tab-volunteer" ? "volunteer" : null;
+      if (!next || submittingRef.current) return;
+      setFormType(next);
+      clearErrors();
+      setErrorMsg(null);
+      setSubmitted(false);
+    };
+    const onHashChange = () => selectLinkedForm(window.location.hash);
+    // Repeated clicks must also work when the URL already has the target hash.
+    const onLinkClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = event.target instanceof Element ? event.target.closest("a[href]") : null;
+      if (!(link instanceof HTMLAnchorElement) || (link.target && link.target !== "_self") || link.hasAttribute("download")) return;
+      const url = new URL(link.href);
+      if (url.origin === window.location.origin && url.pathname === window.location.pathname) {
+        selectLinkedForm(url.hash);
+      }
+    };
+    // Reads links followed before this client:visible island hydrated.
+    onHashChange();
+    window.addEventListener("hashchange", onHashChange);
+    document.addEventListener("click", onLinkClick);
+    return () => {
+      window.removeEventListener("hashchange", onHashChange);
+      document.removeEventListener("click", onLinkClick);
+    };
+  }, [clearErrors]);
+
+  useEffect(() => {
+    if (submitted) successHeading.current?.focus();
+  }, [submitted]);
+
+  const phoneRegistration = register("telefono", {
+    required: "Ingresa tu número de teléfono.",
+    validate: async () => {
+      const instance = phoneInstance.current;
+      if (!instance) return "El campo de teléfono se está cargando. Intenta nuevamente.";
+      try {
+        await instance.promise;
+        return instance.isValidNumber() === true || "Ingresa un número válido para el prefijo seleccionado.";
+      } catch {
+        return "No se pudo cargar la validación del teléfono. Recarga la página e intenta nuevamente.";
+      }
+    },
+  });
+
+  const selectedFile = watch("cv")?.[0];
+  const fieldError = (name: keyof ContactFormData) => errors[name] && (
+    <p id={`contact-${name}-error`} className="contact-field-error" role="alert">{errors[name]?.message}</p>
+  );
+  const fieldAccessibility = (name: keyof ContactFormData) => ({
+    "aria-invalid": !!errors[name],
+    "aria-describedby": errors[name] ? `contact-${name}-error` : undefined,
+  });
+
+  const changeForm = (next: FormType) => {
+    if (isSubmitting || next === formType) return;
+    setFormType(next);
+    clearErrors();
+    setErrorMsg(null);
+    setSubmitted(false);
+  };
+
+  const onTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let next = index;
+    if (event.key === "ArrowRight" || event.key === "ArrowLeft") next = 1 - index;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = 1;
+    else return;
+    event.preventDefault();
+    changeForm(tabs[next].value);
+    tabRefs.current[next]?.focus();
+  };
 
   const onSubmit = async (data: ContactFormData) => {
-    setSubmitting(true);
     setErrorMsg(null);
+    if (volunteer && data.cv?.[0]) {
+      setErrorMsg("El envío de adjuntos no está disponible. Quita el archivo para enviar tu solicitud; puedes enviar tu CV a ameranduclub@gmail.com.");
+      return;
+    }
+    const payload = {
+      formType,
+      nombre: data.nombre.trim(),
+      email: data.email.trim(),
+      pais: data.pais,
+      telefono: phoneInstance.current?.getNumber() || data.telefono,
+      ...(volunteer ? { edad: data.edad, experiencia: data.experiencia?.trim() || "" } : {}),
+    };
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 30000);
     try {
-      const formData = new FormData();
-      formData.append("_subject", `Nuevo contacto de Amerandú — ${data.interes}`);
-      formData.append("_cc", "newluisalatta@gmail.com");
-      formData.append("_template", "table");
-      formData.append("_captcha", "false");
-      formData.append("Nombre y Apellido", data.nombre);
-      formData.append("Edad", String(data.edad));
-      formData.append("País", data.pais);
-      formData.append("Correo electrónico", data.email);
-      formData.append("Teléfono", data.telefono || "No proporcionado");
-      formData.append("Interés", data.interes);
-      formData.append("Encuentro de interés", data.encuentro || "No especificado");
-
-      if (data.cv && data.cv.length > 0) {
-        formData.append("Curriculum_CV", data.cv[0]);
-      }
-
-      const response = await fetch("https://formsubmit.co/ameranduclub@gmail.com", {
+      const response = await fetch("/api/contact", {
         method: "POST",
-        headers: { Accept: "application/json" },
-        body: formData,
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
       });
-
-      if (response.ok) {
-        setSubmitted(true);
-      } else {
-        setErrorMsg("Hubo un problema al enviar el formulario. Por favor, intentá de nuevo.");
+      const result = await response.json().catch(() => null);
+      if (!response.ok || result?.success !== true) {
+        const messages: Record<string, string> = {
+          INVALID_INPUT: "Revisa los datos del formulario; alguno no tiene un formato válido.",
+          BODY_TOO_LARGE: "Tu solicitud es demasiado extensa. Reduce el texto e intenta nuevamente.",
+          MAIL_CONFIG_MISSING: "El servicio de correo aún no está configurado. Contacta con ameranduclub@gmail.com.",
+          MAIL_URL_INVALID: "El servicio de correo tiene un problema de configuración. Contacta con ameranduclub@gmail.com.",
+          GATEWAY_AUTH_REJECTED: "El servicio de correo rechazó la autorización del envío. Contacta con ameranduclub@gmail.com.",
+          GATEWAY_RATE_LIMITED: "El servicio de correo está recibiendo demasiadas solicitudes. Intenta más tarde.",
+          GATEWAY_TIMEOUT: "El servicio de correo tardó demasiado. No pudimos confirmar el envío.",
+          GATEWAY_CONNECTION_FAILED: "No pudimos conectar con el servicio de correo. Intenta más tarde.",
+        };
+        setErrorMsg(messages[result?.code] || "El servicio de correo no pudo confirmar el envío. Contacta con ameranduclub@gmail.com; tus datos siguen en el formulario.");
+        return;
       }
+      reset();
+      setSubmitted(true);
     } catch {
-      setErrorMsg("No se pudo conectar con el servidor. Verificá tu conexión e intentá de nuevo.");
+      setErrorMsg("No pudimos confirmar el envío. Revisa tu conexión e intenta nuevamente; tus datos siguen en el formulario.");
     } finally {
-      setSubmitting(false);
+      window.clearTimeout(timeout);
     }
   };
 
-  if (submitted) {
-    return (
-      <div className="bg-white rounded-3xl p-8 sm:p-10 shadow-xl max-w-2xl mx-auto text-center">
-        <div className="w-16 h-16 bg-verde-dark/10 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#055B3D"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-8 h-8"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </div>
-        <h3 className="text-2xl font-bold text-verde-dark mb-4">
-          ¡Gracias por tu interés!
-        </h3>
-        <p className="text-texto leading-relaxed">
-          Nos alegra mucho que quieras formar parte de Amerandú, club de lectura
-          y pensamiento latinoamericano. En breve nos pondremos en contacto
-          contigo para brindarte más información sobre los encuentros, las
-          lecturas y cómo participar. Mientras tanto, te invitamos a seguirnos en
-          nuestras redes para conocer próximas actividades y novedades del club.
-        </p>
+  const fields = {
+    name: (
+      <div className="contact-field field-name">
+        <label htmlFor="contact-nombre">Nombres y Apellido</label>
+        <input id="contact-nombre" autoComplete="name" placeholder="Tu nombre" {...register("nombre", { required: "Ingresa tu nombre y apellido.", validate: (value) => !!value.trim() || "Ingresa tu nombre y apellido." })} {...fieldAccessibility("nombre")} />
+        {fieldError("nombre")}
       </div>
-    );
-  }
+    ),
+    country: (
+      <div className="contact-field field-country">
+        <label htmlFor="contact-pais">País</label>
+        <select id="contact-pais" autoComplete="country-name" {...register("pais", { required: "Selecciona tu país." })} {...fieldAccessibility("pais")}>
+          <option value="" disabled>Selecciona tu país</option>
+          {countries.map(({ code, name }) => <option key={code} value={name}>{name}</option>)}
+          <option value="Otro">Otro</option>
+        </select>
+        {fieldError("pais")}
+      </div>
+    ),
+    age: volunteer ? (
+      <div className="contact-field field-age">
+          <label htmlFor="contact-edad">Edad</label>
+          <input id="contact-edad" type="number" inputMode="numeric" min="18" step="1" placeholder="Tu edad"
+            {...register("edad", { required: "Ingresa tu edad.", valueAsNumber: true, min: { value: 18, message: "Debes tener al menos 18 años." }, validate: (value) => Number.isInteger(value) || "Ingresa una edad entera." })}
+            {...fieldAccessibility("edad")} />
+          {fieldError("edad")}
+        </div>
+    ) : null,
+    email: (
+      <div className="contact-field field-email">
+        <label htmlFor="contact-email">Email</label>
+        <input id="contact-email" type="email" autoComplete="email" placeholder="tucorreo@outlook.com"
+          {...register("email", { required: "Ingresa tu email.", pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Ingresa un email válido." } })}
+          {...fieldAccessibility("email")} />
+        {fieldError("email")}
+      </div>
+    ),
+    phone: (
+      <div className="contact-field field-phone">
+        <label htmlFor="contact-telefono">Número</label>
+        <input id="contact-telefono" type="tel" autoComplete="tel" placeholder="999 888 777"
+          {...phoneRegistration}
+          ref={(element) => { phoneRegistration.ref(element); phoneInput.current = element; }}
+          {...fieldAccessibility("telefono")} />
+        {fieldError("telefono")}
+      </div>
+    ),
+  };
+  const fieldOrder: Array<keyof typeof fields> = volunteer
+    ? ['name', 'country', 'age', 'email', 'phone']
+    : ['name', 'email', 'phone', 'country'];
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="bg-white rounded-3xl p-6 sm:p-8 md:p-10 shadow-xl max-w-2xl mx-auto"
-      noValidate
-    >
-      <div className="grid sm:grid-cols-2 gap-5">
-        {/* Nombre */}
-        <div className="sm:col-span-2">
-          <label htmlFor="nombre" className={labelBase}>
-            Nombre y Apellido *
-          </label>
-          <input
-            id="nombre"
-            type="text"
-            placeholder="Tu nombre completo"
-            className={inputBase}
-            {...register("nombre", { required: "Este campo es obligatorio" })}
-          />
-          {errors.nombre && (
-            <p className={errorBase}>{errors.nombre.message}</p>
-          )}
-        </div>
-
-        {/* Edad */}
-        <div>
-          <label htmlFor="edad" className={labelBase}>
-            Edad *
-          </label>
-          <input
-            id="edad"
-            type="number"
-            placeholder="Tu edad"
-            className={inputBase}
-            {...register("edad", {
-              required: "Este campo es obligatorio",
-              min: { value: 18, message: "Debés tener al menos 18 años" },
-              valueAsNumber: true,
-            })}
-          />
-          {errors.edad && <p className={errorBase}>{errors.edad.message}</p>}
-        </div>
-
-        {/* País */}
-        <div>
-          <label htmlFor="pais" className={labelBase}>
-            País *
-          </label>
-          <select
-            id="pais"
-            className={inputBase}
-            {...register("pais", { required: "Seleccioná un país" })}
-            defaultValue=""
-          >
-            <option value="" disabled>
-              Seleccioná tu país
-            </option>
-            {paises.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
-          {errors.pais && <p className={errorBase}>{errors.pais.message}</p>}
-        </div>
-
-        {/* Email */}
-        <div className="sm:col-span-2">
-          <label htmlFor="email" className={labelBase}>
-            Correo electrónico *
-          </label>
-          <input
-            id="email"
-            type="email"
-            placeholder="tu@email.com"
-            className={inputBase}
-            {...register("email", {
-              required: "Este campo es obligatorio",
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: "Ingresá un correo válido",
-              },
-            })}
-          />
-          {errors.email && <p className={errorBase}>{errors.email.message}</p>}
-        </div>
-
-        {/* Teléfono */}
-        <div>
-          <label htmlFor="telefono" className={labelBase}>
-            Teléfono
-          </label>
-          <input
-            id="telefono"
-            type="tel"
-            placeholder="+54 9 ..."
-            className={inputBase}
-            {...register("telefono")}
-          />
-        </div>
-
-        {/* Interés */}
-        <div>
-          <label htmlFor="interes" className={labelBase}>
-            Interés *
-          </label>
-          <select
-            id="interes"
-            className={inputBase}
-            {...register("interes", { required: "Seleccioná una opción" })}
-            defaultValue=""
-          >
-            <option value="" disabled>
-              ¿Qué te gustaría?
-            </option>
-            <option value="Quiero participar">Quiero participar</option>
-            <option value="Quiero recibir información">
-              Quiero recibir información
-            </option>
-            <option value="Quiero ser voluntario/a">
-              Quiero ser voluntario/a
-            </option>
-          </select>
-          {errors.interes && (
-            <p className={errorBase}>{errors.interes.message}</p>
-          )}
-        </div>
-
-        {/* Encuentro */}
-        <div className="sm:col-span-2">
-          <label htmlFor="encuentro" className={labelBase}>
-            ¿A qué encuentro te gustaría asistir?
-          </label>
-          <input
-            id="encuentro"
-            type="text"
-            placeholder="Opcional"
-            className={inputBase}
-            {...register("encuentro")}
-          />
-        </div>
-
-        {/* CV Upload */}
-        <div className="sm:col-span-2">
-          <label htmlFor="cv" className={labelBase}>
-            Si deseás ser voluntario/a, agregá aquí tu CV
-          </label>
-          <label
-            htmlFor="cv"
-            className={`group flex flex-col items-center justify-center w-full px-6 py-6 rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer ${
-              selectedFileName
-                ? "border-verde-dark/40 bg-verde-dark/5"
-                : "border-gray-200 bg-gray-50/50 hover:border-verde-dark/40 hover:bg-verde-dark/5"
-            }`}
-          >
-            {selectedFileName ? (
-              <>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#055B3D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 mb-2" aria-hidden="true">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <polyline points="16 13 12 17 8 13" />
-                  <line x1="12" y1="12" x2="12" y2="17" />
-                </svg>
-                <span className="text-sm font-semibold text-verde-dark truncate max-w-full">{selectedFileName}</span>
-                <span className="text-xs text-verde-dark/60 mt-1">Clic para cambiar archivo</span>
-              </>
-            ) : (
-              <>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8 text-gray-300 group-hover:text-verde-dark transition-colors mb-2" aria-hidden="true">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
-                <span className="text-sm font-medium text-verde-dark">Seleccionar archivo</span>
-                <span className="text-xs text-gray-400 mt-1">PDF, DOC o DOCX — máx. 5 MB</span>
-              </>
-            )}
-          </label>
-          <input
-            id="cv"
-            type="file"
-            accept=".pdf,.doc,.docx"
-            className="hidden"
-            {...register("cv")}
-          />
-        </div>
+    <div className="contact-form-area">
+      <p className="contact-switch-label" id="contact-choice-label">Indícanos cómo deseas participar.</p>
+      <div className="contact-tabs" role="tablist" aria-labelledby="contact-choice-label">
+        {tabs.map(({ value, label }, index) => (
+          <button
+            key={value}
+            ref={(element) => { tabRefs.current[index] = element; }}
+            id={`contact-tab-${value}`}
+            type="button"
+            role="tab"
+            aria-selected={formType === value}
+            aria-controls="contact-panel"
+            tabIndex={formType === value ? 0 : -1}
+            disabled={isSubmitting}
+            onClick={() => changeForm(value)}
+            onKeyDown={(event) => onTabKeyDown(event, index)}
+          >{label}</button>
+        ))}
       </div>
-
-      {/* Error message */}
-      {errorMsg && (
-        <div className="mt-6 bg-rojo/10 border border-rojo/20 rounded-2xl px-5 py-3 text-center">
-          <p className="text-rojo text-sm font-medium">{errorMsg}</p>
-        </div>
-      )}
-
-      {/* Submit */}
-      <div className="mt-8 text-center">
-        <button
-          type="submit"
-          disabled={submitting}
-          className="bg-amarillo text-verde-dark px-10 py-3.5 rounded-full font-bold text-lg hover:scale-105 hover:shadow-lg hover:shadow-amarillo/30 transition-all duration-300 disabled:opacity-60 disabled:hover:scale-100 cursor-pointer"
-        >
-          {submitting ? "Enviando..." : "Enviar"}
-        </button>
+      <div className="contact-card" id="contact-panel" role="tabpanel" aria-labelledby={`contact-tab-${formType}`}>
+        {submitted ? (
+          <div className="contact-success" role="status">
+            <Check size={46} aria-hidden="true" />
+            <h3 ref={successHeading} tabIndex={-1}>¡Gracias por tu interés!</h3>
+            <p>Recibimos tus datos. Nos pondremos en contacto contigo para contarte más sobre {volunteer ? "el voluntariado" : "los próximos encuentros de Amerandú"}.</p>
+            <button type="button" className="contact-submit" onClick={() => setSubmitted(false)}>Enviar otra solicitud</button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} noValidate encType="multipart/form-data" aria-busy={isSubmitting}>
+            <h3 className="contact-form-title">{volunteer ? "Contribuye al crecimiento de Amerandú" : "Forma parte de la comunidad"}</h3>
+            <p className="contact-form-description">{volunteer
+              ? "Si te interesa apoyar nuestras iniciativas, completa el formulario y cuéntanos más sobre ti."
+              : "Déjanos tus datos y te contaremos sobre los próximos encuentros y actividades de Amerandú"}</p>
+            <fieldset className={`contact-fields ${volunteer ? "volunteer-fields" : "club-fields"}`} disabled={isSubmitting}>
+              <legend className="contact-sr-only">Datos de {volunteer ? "voluntariado" : "participación"}</legend>
+              {fieldOrder.map((name) => <Fragment key={name}>{fields[name]}</Fragment>)}
+              {volunteer && (
+                <>
+                  <div className="contact-field field-experience">
+                    <label htmlFor="contact-experiencia">Cuéntanos sobre tu experiencia y habilidades (opcional)</label>
+                    <textarea id="contact-experiencia" rows={3} placeholder="Ej. comunicación, diseño, organización de eventos, etc." {...register("experiencia")} />
+                  </div>
+                  <div className="contact-field field-file">
+                    <label className="contact-upload" htmlFor="contact-cv">
+                      <ArrowUpToLine size={26} strokeWidth={1.3} aria-hidden="true" />
+                      <span>{selectedFile?.name || "Seleccionar archivo"}</span>
+                      <small id="contact-cv-hint">PDF, DOC o DOCX · máx. 5 MB · opcional</small>
+                      <input id="contact-cv" type="file" accept=".pdf,.doc,.docx" aria-label="Adjuntar CV (opcional)"
+                        {...register("cv", { validate: {
+                          size: (files) => !files?.[0] || files[0].size <= 5 * 1024 * 1024 || "El archivo no debe superar los 5 MB.",
+                          format: (files) => !files?.[0] || /\.(pdf|doc|docx)$/i.test(files[0].name) || "Selecciona un archivo PDF, DOC o DOCX.",
+                        } })}
+                        aria-invalid={!!errors.cv}
+                        aria-describedby={errors.cv ? "contact-cv-hint contact-cv-error" : "contact-cv-hint"} />
+                    </label>
+                    {selectedFile && <button type="button" className="contact-remove-file" onClick={() => { setValue("cv", undefined, { shouldValidate: true }); const input = document.getElementById("contact-cv") as HTMLInputElement | null; if (input) input.value = ""; }}>Quitar archivo</button>}
+                    {fieldError("cv")}
+                  </div>
+                </>
+              )}
+            </fieldset>
+            {errorMsg && <p className="contact-send-error" role="alert">{errorMsg}</p>}
+            <button type="submit" className="contact-submit" disabled={isSubmitting}>
+              {isSubmitting ? "Enviando…" : "Enviar"} <ArrowRight size={20} aria-hidden="true" />
+            </button>
+          </form>
+        )}
       </div>
-    </form>
+    </div>
   );
 }

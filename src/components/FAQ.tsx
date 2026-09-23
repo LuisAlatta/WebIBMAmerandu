@@ -1,4 +1,10 @@
-import { useState } from "react";
+/**
+ * Acordeón de una pregunta abierta a la vez, hidratado desde FAQSection.astro.
+ * El panel permanece montado para animar 0fr → 1fr en el CSS de FAQSection;
+ * aria-hidden e inert lo excluyen de interacción al cerrar. No usar hidden ni
+ * renderizado condicional: impedirían animar suavemente la altura de cierre.
+ */
+import { useId, useState } from "react";
 
 interface FAQItem {
   question: string;
@@ -32,42 +38,47 @@ function AccordionItem({
   isOpen: boolean;
   onToggle: () => void;
 }) {
+  const id = useId();
+  const questionId = `${id}-question`;
+  const answerId = `${id}-answer`;
+
   return (
-    <div className="border-b border-verde-dark/10 last:border-b-0">
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-between py-5 px-6 text-left group cursor-pointer"
-        aria-expanded={isOpen}
-      >
-        <span className="text-base sm:text-lg font-semibold text-verde-dark pr-4 group-hover:text-verde-medio transition-colors">
-          {item.question}
-        </span>
-        <span
-          className={`flex-shrink-0 w-8 h-8 rounded-full bg-verde-dark/10 flex items-center justify-center transition-transform duration-300 ${
-            isOpen ? "rotate-45" : ""
-          }`}
+    <div className="faq-item">
+      <h3>
+        <button
+          type="button"
+          id={questionId}
+          onClick={onToggle}
+          className="faq-question"
+          aria-expanded={isOpen}
+          aria-controls={answerId}
         >
+          <span>{item.question}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#055B3D"
-            strokeWidth="2.5"
+            stroke="currentColor"
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="w-4 h-4"
+            className="faq-chevron"
+            aria-hidden="true"
           >
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
+            <path d="m5 9 7 6 7-6" />
           </svg>
-        </span>
-      </button>
+        </button>
+      </h3>
       <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-        }`}
+        id={answerId}
+        role="region"
+        aria-labelledby={questionId}
+        aria-hidden={!isOpen}
+        inert={!isOpen}
+        data-open={isOpen}
+        className="faq-answer"
       >
-        <p className="px-6 pb-5 text-texto leading-relaxed">{item.answer}</p>
+        <div className="faq-answer-inner"><p>{item.answer}</p></div>
       </div>
     </div>
   );
@@ -77,17 +88,15 @@ export default function FAQ() {
   const [openQuestion, setOpenQuestion] = useState<string | null>(null);
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="bg-white rounded-3xl shadow-lg shadow-verde-dark/5 overflow-hidden">
-        {faqs.map((faq) => (
-          <AccordionItem
-            key={faq.question}
-            item={faq}
-            isOpen={openQuestion === faq.question}
-            onToggle={() => setOpenQuestion(openQuestion === faq.question ? null : faq.question)}
-          />
-        ))}
-      </div>
+    <div className="faq-accordion">
+      {faqs.map((faq) => (
+        <AccordionItem
+          key={faq.question}
+          item={faq}
+          isOpen={openQuestion === faq.question}
+          onToggle={() => setOpenQuestion(openQuestion === faq.question ? null : faq.question)}
+        />
+      ))}
     </div>
   );
 }

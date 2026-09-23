@@ -1,61 +1,53 @@
 ---
+import { UserRound, Eye } from "lucide-react";
+import arrowIcon from "../assets/icons/arrow-icon.svg?url";
 import WaveDivider from "./WaveDivider.astro";
+import "../styles/landing-sections.css";
+const principles = [
+  { title: "Propósito", icon: UserRound, tone: "purpose", text: "Promover el encuentro y el diálogo en torno a la lectura y el pensamiento latinoamericano, generando un espacio colectivo de reflexión sobre la cultura y las ideas de la región." },
+  { title: "Visión", icon: Eye, tone: "vision", text: "Ser un espacio de referencia para la lectura y el pensamiento latinoamericano, reuniendo una comunidad interesada en reflexionar sobre la identidad y la cultura de la región." },
+  { title: "Misión", icon: arrowIcon, tone: "mission", text: "Crear un espacio de lectura y discusión que fomente el intercambio de ideas, la reflexión crítica y la construcción colectiva de conocimiento sobre América Latina." },
+];
 ---
-
-<section id="nosotros" class="relative bg-crema pt-20 pb-48 md:pt-28 md:pb-60">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
-      <!-- Text content -->
-      <div class="animate-on-scroll">
-        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-verde-dark mb-8">
-          Sobre Amerandú
-        </h2>
-        <div class="space-y-6">
-          <p class="text-texto text-base sm:text-lg leading-relaxed">
-            Amerandú surge de la unión entre <em class="text-verde-dark font-semibold">América</em> y
-            <em class="text-verde-dark font-semibold">arandú</em>, palabra del idioma guaraní que significa
-            sabiduría. El nombre evoca la idea de una sabiduría propia de nuestro
-            continente, construida a partir de sus diversas tradiciones culturales,
-            literarias e intelectuales.
-          </p>
-          <p class="text-texto text-base sm:text-lg leading-relaxed">
-            Amerandú es un club de lectura y pensamiento latinoamericano que propone
-            un espacio de encuentro para leer, dialogar y reflexionar sobre la
-            historia, la cultura y las ideas de América Latina. A través de
-            encuentros periódicos, buscamos fomentar el pensamiento crítico, el
-            intercambio de miradas y la construcción colectiva de conocimiento.
-          </p>
-        </div>
-      </div>
-
-      <!-- Logo illustration -->
-      <div class="animate-on-scroll flex justify-center">
-        <img
-          src="/images/logo-color.png"
-          alt="Logo de Amerandú — Mapa de Latinoamérica con libro abierto y sol"
-          class="w-64 sm:w-72 md:w-80 h-auto drop-shadow-lg"
-          loading="lazy"
-        />
-      </div>
+<section id="nosotros" class="landing-section about" aria-labelledby="about-title">
+  <svg class="organic-decoration" viewBox="0 0 360 470" preserveAspectRatio="none" aria-hidden="true"><path fill="var(--color-verde-dark)" d="M0 0C70 15 30 135 55 165S95 222 76 285S77 347 112 381L0 470Z"/><path fill="var(--color-amarillo)" d="M0 285C72 260 35 347 81 362S198 363 232 397S267 408 301 426S342 455 360 470H0Z"/></svg>
+  <div class="section-inner about-grid">
+    <div class="about-copy">
+      <p class="section-kicker">Nosotros</p>
+      <h2 id="about-title" class="section-title">Sobre<br />Amerandú</h2>
+      <p>Amerandú es una comunidad que encuentra en la lectura un punto de encuentro para conversar, cuestionar y pensar Latinoamérica.</p>
+      <p>Más que leer libros, buscamos compartir ideas, perspectivas y preguntas que nos ayuden a comprender nuestra región.</p>
     </div>
-
-    <!-- Central message quote -->
-    <div class="mt-16 animate-on-scroll">
-      <blockquote class="relative max-w-3xl mx-auto text-center px-8 py-10 bg-verde-dark/5 rounded-3xl">
-        <svg class="absolute top-4 left-6 w-8 h-8 text-amarillo opacity-40" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M11.3 2.6C6.1 5.1 3 9.8 3 15v6h8v-6H7c0-3.3 1.7-6 4.3-7.4zM23.3 2.6C18.1 5.1 15 9.8 15 15v6h8v-6h-4c0-3.3 1.7-6 4.3-7.4z" />
-        </svg>
-        <p class="text-verde-dark text-lg sm:text-xl md:text-2xl font-medium italic leading-relaxed">
-          Construir un espacio de sabiduría compartida donde la lectura y el
-          diálogo permitan explorar, comprender y revalorizar el pensamiento y
-          las tradiciones culturales de América Latina.
-        </p>
-      </blockquote>
+    <div class="principles">
+      {principles.map(({ title, icon: Icon, tone, text }) => (
+        <article class="principle">
+          <div class:list={["principle-icon", tone]}>
+            {typeof Icon === "string"
+              ? <img src={Icon} width={32} height={32} alt="" />
+              : <Icon size={32} strokeWidth={2.4} aria-hidden="true" />}
+          </div>
+          <div><h3>{title}</h3><p>{text}</p></div>
+        </article>
+      ))}
     </div>
   </div>
-
-  <!-- Bottom wave -->
-  <div class="absolute bottom-0 left-0 w-full">
-    <WaveDivider fillColor="rgb(252 174 5 / 0.15)" variant="wave3" />
-  </div>
+  <div class="section-wave" aria-hidden="true"><WaveDivider fillColor="#fff5dd" variant="wave3" /></div>
 </section>
+<style>
+  .about { background: white; padding-block: 110px 145px; }
+  .about-grid { display: grid; grid-template-columns: .85fr 1.5fr; gap: clamp(50px, 7vw, 115px); align-items: start; }
+  .about-copy { color: var(--color-verde-dark); }
+  .about-copy .section-kicker { max-width: 310px; }
+  .about-copy > p:not(.section-kicker) { font-size: 18px; line-height: 1.25; color: #505050; margin-top: 25px; }
+  .principles { display: grid; gap: 45px; }
+  .principle { display: grid; grid-template-columns: 64px 1fr; gap: 24px; align-items: start; }
+  .principle-icon { height: 70px; display: grid; place-items: center; border-radius: 52% 48% 35% 65% / 45% 30% 70% 55%; }
+  .purpose { background: #fbdb95; color: var(--section-mustard); }
+  .vision { background: #43b28e; color: var(--color-verde-dark); border-radius: 36% 64% 53% 47% / 70% 65% 35% 30%; }
+  .mission { background: #ff906e; color: var(--section-terracotta); }
+  h3 { text-transform: uppercase; font-size: 20px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+  .principle p { color: #505050; font-size: 15px; line-height: 1.2; letter-spacing: .035em; }
+  .organic-decoration { position: absolute; bottom: 0; left: 0; width: min(25vw, 355px); height: 440px; pointer-events: none; }
+  @media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; gap: 45px; } .about-copy { max-width: 600px; } .organic-decoration { opacity: .12; } }
+  @media (max-width: 639px) { .about { padding-block: 65px 90px; } .principle { grid-template-columns: 50px 1fr; gap: 18px; } .principle-icon { height: 58px; } .principles { gap: 32px; } }
+</style>

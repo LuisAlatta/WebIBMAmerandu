@@ -1,70 +1,55 @@
 ---
+import { ArrowRight } from "lucide-react";
 import MobileMenu from "./MobileMenu";
+import ameranduLogo from "../assets/images/amerandu-logo-header.webp";
+import { navigationLinks, participationLinks, navigationButtonClass, navigationButtonColors } from "../data/navigation";
 
-interface Props {
-  solid?: boolean;
-}
-
+interface Props { solid?: boolean; }
 const { solid = false } = Astro.props;
 ---
 
 <header
   id="navbar"
   data-solid={solid ? "true" : "false"}
-  class={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${solid ? "bg-verde-dark shadow-lg" : "bg-transparent"}`}
+  class={`fixed top-0 left-0 w-full z-50 transition-colors duration-200 ${solid ? "bg-verde-dark shadow-lg" : "bg-transparent"}`}
 >
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16 md:h-20">
-      <!-- Logo -->
-      <a href="/#inicio" class="flex items-center gap-2 group">
-        <img
-          src="/images/logo-blanco.png"
-          alt="Amerandú — Club de lectura y pensamiento latinoamericano"
-          class="h-10 md:h-14 w-auto"
-        />
-      </a>
+  <div class="header-inner">
+    <a href="/#inicio" class="header-brand" aria-label="Amerandú — Inicio">
+      <img src={ameranduLogo.src} width={ameranduLogo.width} height={ameranduLogo.height} alt="Amerandú" />
+    </a>
 
-      <!-- Desktop nav -->
-      <nav class="hidden md:flex items-center gap-1 lg:gap-2">
-        <a
-          href="/#inicio"
-          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
-          >Inicio</a
-        >
-        <a
-          href="/#nosotros"
-          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
-          >Nosotros</a
-        >
-        <a
-          href="/#club"
-          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
-          >Club de lectura</a
-        >
-        <a
-          href="/#unete"
-          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
-          >Únete</a
-        >
-        <a
-          href="/#faq"
-          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
-          >FAQ</a
-        >
-        <a
-          href="/#contacto"
-          class="text-white/90 hover:text-amarillo px-3 py-2 text-sm font-medium transition-colors"
-          >Contacto</a
-        >
-        <a
-          href="/#contacto"
-          class="ml-3 bg-rojo text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-rojo/90 hover:scale-105 hover:shadow-lg transition-all duration-300"
-          >Unirme al club</a
-        >
-      </nav>
+    <nav class="desktop-navigation" aria-label="Navegación principal">
+      <ul class="navigation-links">
+        {navigationLinks.map(({ href, label }) => <li><a href={href}>{label}</a></li>)}
+      </ul>
+      <div class="navigation-actions">
+        {participationLinks.map(({ href, label, secondary }) => (
+          <a href={href} class:list={[navigationButtonClass, secondary ? navigationButtonColors.secondary : navigationButtonColors.primary]}>
+            {label}<ArrowRight size={16} aria-hidden="true" />
+          </a>
+        ))}
+      </div>
+    </nav>
 
-      <!-- Mobile menu -->
-      <MobileMenu client:load />
-    </div>
+    <MobileMenu client:load />
   </div>
 </header>
+
+<style>
+  .header-inner { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 24px; width: min(100% - 48px, 1440px); height: 80px; margin-inline: auto; }
+  .header-brand { display: block; flex-shrink: 0; width: 145px; }
+  .header-brand img { display: block; width: 100%; height: auto; }
+  .header-brand:focus-visible { outline: 2px solid white; outline-offset: 5px; border-radius: 3px; }
+  .desktop-navigation { display: none; align-items: center; gap: 26px; }
+  .navigation-links { display: flex; align-items: center; gap: 15px; }
+  .navigation-links a { display: block; padding-block: 12px; font-size: 13px; font-weight: 500; white-space: nowrap; color: rgb(255 255 255 / .95); transition: color .2s ease; }
+  .navigation-links a:hover { color: var(--color-amarillo); }
+  .navigation-links a:focus-visible { outline: 2px solid white; outline-offset: 4px; border-radius: 3px; }
+  .navigation-actions { display: flex; gap: 10px; align-items: center; }
+  @media (min-width: 1280px) {
+    .desktop-navigation { display: flex; margin-left: auto; }
+    .navigation-links { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+  }
+  @media (max-width: 639px) { .header-inner { height: 64px; width: calc(100% - 40px); } .header-brand { width: 130px; } }
+  @media (prefers-reduced-motion: reduce) { .navigation-links a { transition: none; } }
+</style>

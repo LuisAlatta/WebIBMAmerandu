@@ -1,0 +1,14 @@
+---
+// Motivo vegetal SVG reutilizable: hereda currentColor y recibe posición/tamaño
+// mediante class. Es decorativo y no participa en el árbol de accesibilidad.
+interface Props { class?: string; }
+const { class: className } = Astro.props;
+---
+<svg class={className} viewBox="0 0 180 480" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true" focusable="false">
+  {[0, 155, 310].map((y) => (
+    <g transform={`translate(0 ${y})`}>
+      <path d="M-25 135C10 112 65 91 122 15M12 114C36 66 20 38 12 28C16 66 3 84-9 95M42 97C80 92 82 26 136 12C103 12 91 40 75 62C61 83 51 87 42 97ZM18 110C42 117 62 129 81 126M-12 144C45 125 78 139 105 157C69 156 46 136 15 142" />
+      <path d="M-4 143L78 151M22 139L13 149M37 140L29 151M53 143L46 154M-9 90C-1 59-12 42-27 33M-11 96C-2 118 7 123 29 122" />
+    </g>
+  ))}
+</svg>
