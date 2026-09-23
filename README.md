@@ -68,8 +68,8 @@ El proyecto está preparado para desplegarse en **Cloudflare**. La compilación 
 
 El formulario llama a `/api/contact`, implementado como Pages Function en
 `functions/api/contact.ts`. Esta función envía el correo mediante `POST /send`
-del mail-gateway. El token permanece en el servidor. El destinatario activo es
-`test@imbinstitute.com`, definido en el campo `to` de la función; el email del solicitante
+del mail-gateway. El token permanece en el servidor. Los destinatarios activos son
+`ameranduclub@gmail.com` y `newluisalatta@gmail.com`, definidos en el campo `to` de la función; el email del solicitante
 se incluye en el contenido (la API proporcionada no documenta `replyTo`).
 
 Configura en `.env` las variables de `.env.example`: `MAIL_GATEWAY_URL`

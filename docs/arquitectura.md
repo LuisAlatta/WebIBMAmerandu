@@ -19,7 +19,8 @@ Cloudflare Pages la despliega junto al sitio. No se usan Astro Actions ni SSR.
 | `src/styles/motion.css` | Estados y microinteracciones: hover, luz sobre las fotos, agradecimiento y movimiento reducido. |
 | `src/styles/landing-sections.css` | Colores, anchos, títulos y separadores compartidos entre secciones. Los estilos propios permanecen en cada `.astro`. |
 | `src/components/ContactForm.tsx` | Campos, pestañas, teléfono internacional, validación, envío y mensajes de resultado. |
-| `functions/api/contact.ts` | Validación del servidor y envío autenticado al gateway. Aquí se editan destinatarios y plantilla del correo. |
+| `functions/api/contact.ts` | Validación del servidor y envío autenticado al gateway. Aquí se editan destinatarios y campos incluidos en el correo. |
+| `src/server/contact-email.ts` | Plantilla HTML del correo con estilos inline, datos escapados y botón para responder al solicitante. Se importa solo desde la función. |
 | `src/components/MobileMenu.tsx` | Modal nativo, bloqueo de scroll y cierre al pasar a escritorio. Su breakpoint debe coincidir con Navbar. |
 | `src/components/FAQ.tsx` | Estado y accesibilidad del acordeón. La animación de altura está en `FAQSection.astro`. |
 | `src/components/Button.astro` | Enlace CTA compartido con variantes principal/secundaria y tamaño compacto. |
@@ -65,8 +66,8 @@ Flujo: **ContactForm → POST /api/contact → POST /send del gateway → Brevo*
   voluntariado añade edad y experiencia. Nunca recibe la credencial del gateway.
 - La función acepta JSON de hasta 16 KiB, valida campos y escapa el texto que
   se inserta en HTML. El remitente se obtiene de `MAIL_GATEWAY_FROM`.
-- El destinatario activo es `test@imbinstitute.com`. Se cambia en `to` dentro de
-  la función, no en `.env`. Los correos previstos del club están documentados junto a él.
+- Los destinatarios activos son `ameranduclub@gmail.com` y `newluisalatta@gmail.com`.
+  Se cambian en `to` dentro de la función, no en `.env`.
 - El contrato actual no incluye adjuntos ni `replyTo`: el CV no se envía y el
   email del solicitante aparece en el cuerpo. No cambiar el remitente por el
   email del visitante: Brevo debe autorizar la dirección remitente.

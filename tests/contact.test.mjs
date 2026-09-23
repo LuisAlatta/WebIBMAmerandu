@@ -31,7 +31,7 @@ test("sends the gateway contract, escapes HTML and keeps secrets server-side", a
   assert.equal(sentOptions.redirect, "manual");
   assert.equal(sentOptions.headers.Authorization, "Bearer test-secret");
   assert.equal(sent.from, env.MAIL_GATEWAY_FROM);
-  assert.deepEqual(sent.to, [{ email: "test@imbinstitute.com" }]);
+  assert.deepEqual(sent.to, [{ email: "ameranduclub@gmail.com" }, { email: "newluisalatta@gmail.com" }]);
   assert.ok(sent.htmlContent.includes("Ana &lt;script&gt;"));
   assert.equal(sent.tag, "club");
 });

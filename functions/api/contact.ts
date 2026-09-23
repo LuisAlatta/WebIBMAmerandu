@@ -5,6 +5,8 @@
  * Se ejecuta con Wrangler o en Pages; astro dev no sirve esta ruta.
  * Ver docs/arquitectura.md para configuración, destinatarios y códigos de error.
  */
+import { renderContactEmail } from "../../src/server/contact-email.ts";
+
 interface Env {
   MAIL_GATEWAY_URL: string;
   MAIL_GATEWAY_TOKEN: string;
@@ -12,10 +14,6 @@ interface Env {
 }
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-// Los datos del visitante son texto, no HTML confiable, dentro de la plantilla.
-const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (character) => (
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]!
-));
 const json = (body: object, status = 200) => Response.json(body, {
   status, headers: { "Cache-Control": "no-store" },
 });
@@ -96,12 +94,11 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       body: JSON.stringify({
         from: env.MAIL_GATEWAY_FROM,
         fromName: "Amerandú",
-        // Destinatario actual de pruebas. Editar aquí para cambiar quién recibe el correo.
         // Destinatarios previstos: ameranduclub@gmail.com y newluisalatta@gmail.com.
-        to: [{ email: "test@imbinstitute.com" }],
+        to: [{ email: "ameranduclub@gmail.com" }, { email: "newluisalatta@gmail.com" }],
+        // to: [{ email: "test@imbinstitute.com" }],
         subject: `Nuevo contacto de Amerandú — ${interest}`,
-        htmlContent: `<h1>Nuevo contacto de Amerandú</h1><table>${fields.map(([label, value]) =>
-          `<tr><th>${label}</th><td style="white-space:pre-wrap">${escapeHtml(value)}</td></tr>`).join("")}</table>`,
+        htmlContent: renderContactEmail(fields, interest, email),
         tag: volunteer ? "voluntariado" : "club",
       }),
     });

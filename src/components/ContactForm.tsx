@@ -17,6 +17,7 @@ import "intl-tel-input/styles";
 import "../styles/contact-form.css";
 
 type FormType = "club" | "volunteer";
+const submissionError = "Hubo un problema al enviar tu solicitud. Intenta nuevamente en un momento; tus datos siguen en el formulario.";
 interface ContactFormData {
   nombre: string;
   pais: string;
@@ -202,20 +203,14 @@ export default function ContactForm() {
         const messages: Record<string, string> = {
           INVALID_INPUT: "Revisa los datos del formulario; alguno no tiene un formato válido.",
           BODY_TOO_LARGE: "Tu solicitud es demasiado extensa. Reduce el texto e intenta nuevamente.",
-          MAIL_CONFIG_MISSING: "El servicio de correo aún no está configurado. Contacta con ameranduclub@gmail.com.",
-          MAIL_URL_INVALID: "El servicio de correo tiene un problema de configuración. Contacta con ameranduclub@gmail.com.",
-          GATEWAY_AUTH_REJECTED: "El servicio de correo rechazó la autorización del envío. Contacta con ameranduclub@gmail.com.",
-          GATEWAY_RATE_LIMITED: "El servicio de correo está recibiendo demasiadas solicitudes. Intenta más tarde.",
-          GATEWAY_TIMEOUT: "El servicio de correo tardó demasiado. No pudimos confirmar el envío.",
-          GATEWAY_CONNECTION_FAILED: "No pudimos conectar con el servicio de correo. Intenta más tarde.",
         };
-        setErrorMsg(messages[result?.code] || "El servicio de correo no pudo confirmar el envío. Contacta con ameranduclub@gmail.com; tus datos siguen en el formulario.");
+        setErrorMsg(messages[result?.code] || submissionError);
         return;
       }
       reset();
       setSubmitted(true);
     } catch {
-      setErrorMsg("No pudimos confirmar el envío. Revisa tu conexión e intenta nuevamente; tus datos siguen en el formulario.");
+      setErrorMsg(submissionError);
     } finally {
       window.clearTimeout(timeout);
     }
