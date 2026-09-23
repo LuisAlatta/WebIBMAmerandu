@@ -64,12 +64,16 @@ Flujo: **ContactForm → POST /api/contact → POST /send del gateway → Brevo*
 
 - El navegador manda tipo de formulario, nombre, email, país y teléfono; en
   voluntariado añade edad y experiencia. Nunca recibe la credencial del gateway.
-- La función acepta JSON de hasta 16 KiB, valida campos y escapa el texto que
+- La función limita los datos de texto a 16 KiB y reserva espacio adicional para
+  un CV de hasta 5 MiB codificado en base64. Valida campos y escapa el texto que
   se inserta en HTML. El remitente se obtiene de `MAIL_GATEWAY_FROM`.
 - Los destinatarios activos son `ameranduclub@gmail.com` y `newluisalatta@gmail.com`.
   Se cambian en `to` dentro de la función, no en `.env`.
-- El contrato actual no incluye adjuntos ni `replyTo`: el CV no se envía y el
-  email del solicitante aparece en el cuerpo. No cambiar el remitente por el
+- El CV opcional de voluntariado se envía como `attachment: [{ name, content }]`,
+  con base64 puro. Se valida un solo archivo, extensión PDF/DOC/DOCX, nombre,
+  base64 canónico y tamaño decodificado de 1 byte a 5 MiB; no se aceptan URLs.
+  Esta validación no analiza el documento ni sustituye un antivirus.
+  El email del solicitante aparece en el cuerpo y en `replyTo`. No cambiar el remitente por el
   email del visitante: Brevo debe autorizar la dirección remitente.
 - La función espera hasta 25 segundos; el navegador espera 30. No hay reintentos
   automáticos, para evitar duplicados cuando un envío se acepta pero se pierde la respuesta.

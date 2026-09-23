@@ -14,6 +14,10 @@ interface Env {
 }
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const maxFileBytes = 5 * 1024 * 1024;
+const maxBase64Length = 4 * Math.ceil(maxFileBytes / 3);
+// Base64 ocupa aproximadamente 4/3 del archivo. Se reserva espacio para el JSON.
+const maxBodyBytes = maxBase64Length + 64 * 1024;
 const json = (body: object, status = 200) => Response.json(body, {
   status, headers: { "Cache-Control": "no-store" },
 });
@@ -40,7 +44,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     const { done, value } = await reader.read();
     if (done) break;
     size += value.byteLength;
-    if (size > 16384) {
+    if (size > maxBodyBytes) {
       await reader.cancel();
       return failure("BODY_TOO_LARGE", 413);
     }
@@ -54,6 +58,10 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     data = JSON.parse(new TextDecoder().decode(bytes));
     if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error();
   } catch { return failure("INVALID_INPUT", 400); }
+  // El límite de texto sigue siendo independiente del espacio reservado al CV.
+  if (new TextEncoder().encode(JSON.stringify({ ...data, attachment: undefined })).byteLength > 16384) {
+    return failure("BODY_TOO_LARGE", 413);
+  }
   const field = (key: string, max: number) => typeof data[key] === "string"
     && data[key].trim().length <= max ? data[key].trim() : "";
   const nombre = field("nombre", 200);
@@ -66,8 +74,31 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
     || !["club", "volunteer"].includes(String(data.formType))
     || (volunteer && (typeof data.edad !== "number" || !Number.isInteger(data.edad) || data.edad < 18))
     || (data.experiencia != null && (typeof data.experiencia !== "string" || data.experiencia.length > 5000))
-    || data.cv != null || data.attachment != null) {
+    || data.cv != null) {
     return failure("INVALID_INPUT", 400);
+  }
+  let attachment: Array<{ name: string; content: string }> | undefined;
+  if (data.attachment != null) {
+    if (!volunteer || !Array.isArray(data.attachment) || data.attachment.length !== 1) {
+      return failure("INVALID_ATTACHMENT", 400);
+    }
+    const file = data.attachment[0];
+    if (!file || typeof file !== "object" || typeof file.name !== "string"
+      || file.name.length > 255 || /[\x00-\x1f\x7f/\\]/.test(file.name)
+      || !/^.+\.(pdf|doc|docx)$/i.test(file.name)
+      || typeof file.content !== "string" || !file.content.length
+      || file.content.length > maxBase64Length || file.content.length % 4 !== 0
+      || file.url != null) {
+      return failure("INVALID_ATTACHMENT", 400);
+    }
+    try {
+      const decoded = atob(file.content);
+      if (!decoded.length || decoded.length > maxFileBytes || btoa(decoded) !== file.content) {
+        return failure("INVALID_ATTACHMENT", 400);
+      }
+    } catch { return failure("INVALID_ATTACHMENT", 400); }
+    // Solo se reenvían nombre y contenido validados; no se aceptan URLs externas.
+    attachment = [{ name: file.name, content: file.content }];
   }
   if (!env.MAIL_GATEWAY_TOKEN || !env.MAIL_GATEWAY_URL || !emailPattern.test(env.MAIL_GATEWAY_FROM || "")) {
     return failure("MAIL_CONFIG_MISSING", 503);
@@ -76,6 +107,7 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
   const fields = [["Nombre y Apellido", nombre], ["Email", email], ["País", pais],
     ["Teléfono", telefono], ["Interés", interest]];
   if (volunteer) fields.push(["Edad", String(data.edad)], ["Experiencia y habilidades", experiencia || "No proporcionadas"]);
+  if (attachment) fields.push(["CV adjunto", attachment[0].name]);
 
   let url: URL;
   try {
@@ -94,11 +126,13 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
       body: JSON.stringify({
         from: env.MAIL_GATEWAY_FROM,
         fromName: "Amerandú",
+        replyTo: email,
         // Destinatarios previstos: ameranduclub@gmail.com y newluisalatta@gmail.com.
         to: [{ email: "ameranduclub@gmail.com" }, { email: "newluisalatta@gmail.com" }],
         // to: [{ email: "test@imbinstitute.com" }],
         subject: `Nuevo contacto de Amerandú — ${interest}`,
         htmlContent: renderContactEmail(fields, interest, email),
+        ...(attachment ? { attachment } : {}),
         tag: volunteer ? "voluntariado" : "club",
       }),
     });

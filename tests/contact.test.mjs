@@ -31,27 +31,32 @@ test("sends the gateway contract, escapes HTML and keeps secrets server-side", a
   assert.equal(sentOptions.redirect, "manual");
   assert.equal(sentOptions.headers.Authorization, "Bearer test-secret");
   assert.equal(sent.from, env.MAIL_GATEWAY_FROM);
+  assert.equal(sent.replyTo, data.email);
+  assert.equal(sent.attachment, undefined);
   assert.deepEqual(sent.to, [{ email: "ameranduclub@gmail.com" }, { email: "newluisalatta@gmail.com" }]);
   assert.ok(sent.htmlContent.includes("Ana &lt;script&gt;"));
   assert.equal(sent.tag, "club");
 });
 
-test("supports a /send URL and volunteer details", async () => {
+test("supports a /send URL, volunteer details and a base64 CV", async () => {
   let sent;
   let sentUrl;
+  const attachment = [{ name: "cv.pdf", content: btoa("%PDF-1.4\nCV de ejemplo") }];
   globalThis.fetch = async (url, options) => {
     sentUrl = String(url);
     sent = JSON.parse(options.body);
     return Response.json({ success: true });
   };
   const response = await onRequest({
-    request: request({ ...data, formType: "volunteer", edad: 22, experiencia: "Diseño & arte" }),
+    request: request({ ...data, formType: "volunteer", edad: 22, experiencia: "Diseño & arte", attachment }),
     env: { ...env, MAIL_GATEWAY_URL: "https://gateway.example.com/send/" },
   });
   assert.equal(response.status, 200);
   assert.equal(sentUrl, "https://gateway.example.com/send");
   assert.equal(sent.tag, "voluntariado");
   assert.ok(sent.htmlContent.includes("Diseño &amp; arte"));
+  assert.deepEqual(sent.attachment, attachment);
+  assert.ok(sent.htmlContent.includes("cv.pdf"));
 });
 
 test("rejects invalid submissions without contacting the gateway", async () => {
@@ -62,6 +67,18 @@ test("rejects invalid submissions without contacting the gateway", async () => {
   }
   assert.equal((await onRequest({ request: request({ ...data, nombre: "x".repeat(17000) }), env })).status, 413);
   assert.equal((await onRequest({ request: request(), env: { ...env, MAIL_GATEWAY_TOKEN: "" } })).status, 503);
+  for (const attachment of [
+    [{ name: "cv.pdf", content: "data:application/pdf;base64,SG9sYQ==" }],
+    [{ name: "cv.exe", content: "SG9sYQ==" }],
+    [{ name: "cv.pdf", content: "" }],
+    [{ name: "cv.pdf", url: "https://example.com/cv.pdf" }],
+    [{ name: "../cv.pdf", content: "SG9sYQ==" }],
+    [{ name: "cv.pdf", content: btoa("x".repeat(5 * 1024 * 1024 + 1)) }],
+    [{ name: "cv.pdf", content: "SG9sYQ==" }, { name: "cv2.pdf", content: "SG9sYQ==" }],
+  ]) {
+    assert.equal((await onRequest({ request: request({ ...data, formType: "volunteer", edad: 22, attachment }), env })).status, 400);
+  }
+  assert.equal((await onRequest({ request: request({ ...data, attachment: [{ name: "cv.pdf", content: "SG9sYQ==" }] }), env })).status, 400);
   assert.equal(calls, 0);
 });
 

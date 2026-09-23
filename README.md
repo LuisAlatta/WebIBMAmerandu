@@ -8,7 +8,7 @@ Sitio web de **Amerandú**, un espacio para leer, dialogar y reflexionar sobre l
 
 - Landing de una sola página con secciones de presentación, misión y visión, valores y club de lectura.
 - Sección de preguntas frecuentes (FAQ) interactiva.
-- Formulario de contacto y voluntariado integrado con mail-gateway (CV por correo separado).
+- Formulario de contacto y voluntariado integrado con mail-gateway y CV opcional.
 - Botón directo de WhatsApp.
 - Página de políticas de privacidad.
 - Diseño responsive y optimizado para SEO.
@@ -70,7 +70,7 @@ El formulario llama a `/api/contact`, implementado como Pages Function en
 `functions/api/contact.ts`. Esta función envía el correo mediante `POST /send`
 del mail-gateway. El token permanece en el servidor. Los destinatarios activos son
 `ameranduclub@gmail.com` y `newluisalatta@gmail.com`, definidos en el campo `to` de la función; el email del solicitante
-se incluye en el contenido (la API proporcionada no documenta `replyTo`).
+se incluye en el contenido y en `replyTo` para responder directamente al solicitante.
 
 Configura en `.env` las variables de `.env.example`: `MAIL_GATEWAY_URL`
 (URL base o URL terminada en `/send`), `MAIL_GATEWAY_TOKEN` y
@@ -89,8 +89,10 @@ guardando el token como secreto, y vuelve a desplegar. Despliega mediante la
 integración Git de Pages o `wrangler pages deploy dist` desde la raíz del proyecto
 para incluir `functions/`; subir solo los archivos estáticos no incluye la API.
 
-El contrato del gateway compartido no incluye adjuntos. Si se selecciona un CV,
-el formulario pide retirarlo y enviarlo por correo, sin descartarlo silenciosamente.
+El voluntariado permite adjuntar un CV PDF, DOC o DOCX de hasta 5 MB. Se convierte
+a base64 puro y se envía en `attachment`, dentro del JSON. El servidor valida
+cantidad, nombre/extensión, codificación y tamaño; no almacena el archivo.
+`MAIL_GATEWAY_TOKEN` es el token del proyecto registrado en KV, no la API key de Brevo.
 
 ## Guía de mantenimiento
 

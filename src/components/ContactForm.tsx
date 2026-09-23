@@ -3,8 +3,8 @@
  * React Hook Form valida los campos; intl-tel-input normaliza el teléfono.
  * Los hashes contact-tab-* seleccionan la pestaña desde cualquier CTA de la web.
  * Solo envía datos a /api/contact: remitente, destinatarios y token viven en servidor.
- * El CV permanece en el dispositivo: su envío se bloquea hasta que el gateway
- * disponga de un contrato para adjuntos. Un fallo conserva los datos del usuario.
+ * El CV opcional se convierte a base64 puro para el contrato JSON del gateway.
+ * Un fallo conserva los datos y el archivo seleccionado para volver a intentar.
  */
 import { Fragment, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
@@ -176,10 +176,6 @@ export default function ContactForm() {
 
   const onSubmit = async (data: ContactFormData) => {
     setErrorMsg(null);
-    if (volunteer && data.cv?.[0]) {
-      setErrorMsg("El envío de adjuntos no está disponible. Quita el archivo para enviar tu solicitud; puedes enviar tu CV a ameranduclub@gmail.com.");
-      return;
-    }
     const payload = {
       formType,
       nombre: data.nombre.trim(),
@@ -192,17 +188,37 @@ export default function ContactForm() {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 30000);
     try {
+      const file = volunteer ? data.cv?.[0] : undefined;
+      let attachment: Array<{ name: string; content: string }> | undefined;
+      if (file) {
+        const content = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result;
+            if (typeof result !== "string" || !result.includes(";base64,")) {
+              reject(new Error("file-read-failed"));
+              return;
+            }
+            resolve(result.slice(result.indexOf(",") + 1));
+          };
+          reader.onerror = () => reject(new Error("file-read-failed"));
+          reader.onabort = () => reject(new Error("file-read-aborted"));
+          reader.readAsDataURL(file);
+        });
+        attachment = [{ name: file.name, content }];
+      }
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { Accept: "application/json", "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, ...(attachment ? { attachment } : {}) }),
         signal: controller.signal,
       });
       const result = await response.json().catch(() => null);
       if (!response.ok || result?.success !== true) {
         const messages: Record<string, string> = {
           INVALID_INPUT: "Revisa los datos del formulario; alguno no tiene un formato válido.",
-          BODY_TOO_LARGE: "Tu solicitud es demasiado extensa. Reduce el texto e intenta nuevamente.",
+          BODY_TOO_LARGE: "Tu solicitud es demasiado grande. Reduce el texto o el tamaño del CV e intenta nuevamente.",
+          INVALID_ATTACHMENT: "Revisa el CV: debe ser un archivo PDF, DOC o DOCX válido, no vacío y de hasta 5 MB.",
         };
         setErrorMsg(messages[result?.code] || submissionError);
         return;
@@ -318,7 +334,7 @@ export default function ContactForm() {
                       <small id="contact-cv-hint">PDF, DOC o DOCX · máx. 5 MB · opcional</small>
                       <input id="contact-cv" type="file" accept=".pdf,.doc,.docx" aria-label="Adjuntar CV (opcional)"
                         {...register("cv", { validate: {
-                          size: (files) => !files?.[0] || files[0].size <= 5 * 1024 * 1024 || "El archivo no debe superar los 5 MB.",
+                          size: (files) => !files?.[0] || (files[0].size > 0 && files[0].size <= 5 * 1024 * 1024) || "El archivo debe contener datos y no superar los 5 MB.",
                           format: (files) => !files?.[0] || /\.(pdf|doc|docx)$/i.test(files[0].name) || "Selecciona un archivo PDF, DOC o DOCX.",
                         } })}
                         aria-invalid={!!errors.cv}
