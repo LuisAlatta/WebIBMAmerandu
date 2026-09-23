@@ -75,6 +75,8 @@ export default function ContactForm() {
     const instance = intlTelInput(input, {
       initialCountry: "pe",
       separateDialCode: true,
+      // La librería actualiza el ejemplo al cargar utils y al cambiar de país.
+      placeholderNumberPolicy: "AGGRESSIVE",
       showFlags: true,
       countryNameLocale: "es",
       uiTranslations: spanish,
@@ -272,7 +274,7 @@ export default function ContactForm() {
     phone: (
       <div className="contact-field field-phone">
         <label htmlFor="contact-telefono">Número</label>
-        <input id="contact-telefono" type="tel" autoComplete="tel" placeholder="999 888 777"
+        <input id="contact-telefono" type="tel" autoComplete="tel"
           {...phoneRegistration}
           ref={(element) => { phoneRegistration.ref(element); phoneInput.current = element; }}
           {...fieldAccessibility("telefono")} />

@@ -3,7 +3,7 @@
  * Recibe datos del formulario, los valida y arma el correo para POST /send.
  * Las credenciales solo se leen de context.env en el servidor, nunca del cliente.
  * Se ejecuta con Wrangler o en Pages; astro dev no sirve esta ruta.
- * Ver docs/arquitectura.md para configuración, destinatarios y códigos de error.
+ * Ver README.md para configuración local y despliegue.
  */
 import { renderContactEmail } from "../../src/server/contact-email.ts";
 
@@ -11,6 +11,8 @@ interface Env {
   MAIL_GATEWAY_URL: string;
   MAIL_GATEWAY_TOKEN: string;
   MAIL_GATEWAY_FROM: string;
+  // preview:cloudflare fija "local"; sin esta variable se usan los destinatarios del club.
+  MAIL_ENV?: string;
 }
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -127,9 +129,9 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
         from: env.MAIL_GATEWAY_FROM,
         fromName: "Amerandú",
         replyTo: email,
-        // Destinatarios previstos: ameranduclub@gmail.com y newluisalatta@gmail.com.
-        to: [{ email: "ameranduclub@gmail.com" }, { email: "newluisalatta@gmail.com" }],
-        // to: [{ email: "test@imbinstitute.com" }],
+        to: env.MAIL_ENV === "local"
+          ? [{ email: "test@imbinstitute.com" }]
+          : [{ email: "ameranduclub@gmail.com" }, { email: "newluisalatta@gmail.com" }],
         subject: `Nuevo contacto de Amerandú — ${interest}`,
         htmlContent: renderContactEmail(fields, interest, email),
         ...(attachment ? { attachment } : {}),

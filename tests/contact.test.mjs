@@ -36,6 +36,9 @@ test("sends the gateway contract, escapes HTML and keeps secrets server-side", a
   assert.deepEqual(sent.to, [{ email: "ameranduclub@gmail.com" }, { email: "newluisalatta@gmail.com" }]);
   assert.ok(sent.htmlContent.includes("Ana &lt;script&gt;"));
   assert.equal(sent.tag, "club");
+  const localResponse = await onRequest({ request: request(), env: { ...env, MAIL_ENV: "local" } });
+  assert.equal(localResponse.status, 200);
+  assert.deepEqual(sent.to, [{ email: "test@imbinstitute.com" }]);
 });
 
 test("supports a /send URL, volunteer details and a base64 CV", async () => {
